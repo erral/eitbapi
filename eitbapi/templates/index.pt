@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="${request.locale_name}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="pyramid web application">
+    <meta name="author" content="Pylons Project">
+    <link rel="shortcut icon" href="${request.static_url('eitbapi:static/pyramid-16x16.png')}">
+
+    <title>EITB Nahieran API</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Custom styles for this scaffold -->
+    <link href="${request.static_url('eitbapi:static/theme.css')}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="eitb-api-home">
+      <div class="container">
+        <div class="well">
+          <p>
+            Webgune honek EITB Nahieran zerbitzuaren APIa eskaintzen du.
+          </p>
+        </div>
+        <div class="links">
+          <a class="btn btn-default" href="${request.route_url('programs')}">
+            Programa zerrenda
+          </a>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+
+  </body>
+</html>

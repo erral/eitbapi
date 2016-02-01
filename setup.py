@@ -13,10 +13,12 @@ requires = [
     'pyramid_chameleon',
     'pyramid_debugtoolbar',
     'waitress',
+    'youtube-dl',
+    'requests',
     ]
 
 setup(name='eitbapi',
-      version='0.0',
+      version='1.0',
       description='eitbapi',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
