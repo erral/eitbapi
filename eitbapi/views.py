@@ -19,12 +19,15 @@ def index(request):
 
 @view_config(route_name='programs', renderer='prettyjson')
 def programs(request):
+    """get all information about all the programs.
+    How: scrap the website and look for the javascript links.
+    """
     data = requests.get(EITB_FRONT_PAGE_URL)
     matches = re.compile(EITB_EPISODE_LIST_REGEX, re.DOTALL).findall(data.text)
 
     result = {
         '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
-        '@id': request.route_url('home'),
+        '@id': request.route_url('programs'),
         '@type': 'SiteRoot',
         'parent': {},
     }
@@ -49,6 +52,9 @@ def programs(request):
 
 @view_config(route_name='playlist', renderer='prettyjson')
 def playlist(request):
+    """ get all the information about the given program.
+        How: get the information from a pseudo-api
+    """
     playlist_id = request.matchdict['playlist_id']
     result = {
         '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
@@ -66,12 +72,11 @@ def playlist(request):
     playlist_data['member'] = []
     for web_media in web_medias:
         item = {
-            '@id': create_video_url(
+            '@id': create_internal_video_url(
                 playlist_data.get('name_playlist'),
                 playlist_data.get('id_web_playlist'),
                 web_media.get('NAME_ES'),
                 web_media.get('ID_WEB_MEDIA'),
-                add_domain=False,
                 request=request,
             ),
             'title': web_media.get('NAME_ES'),
@@ -87,6 +92,9 @@ def playlist(request):
 
 @view_config(route_name='episode', renderer='prettyjson')
 def episode(request):
+    """ Get all the information and the video links from a given episode.
+        How: use youtube-dl to get the information
+    """
     episode_url = request.matchdict['episode_url']
     url = EITB_VIDEO_BASE_URL + episode_url
 
@@ -100,28 +108,36 @@ def episode(request):
 
     ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
     video_data = ydl.extract_info(url, download=False)
-    
+
     result.update(video_data)
     return result
 
 
-def create_video_url(playlist_title, playlist_id, video_title, video_id, add_domain=True, request=None):
-    playlist_title = playlist_title.lower().replace(' ', '-').replace('(', '').replace(')', '')
-    video_title = playlist_title.lower().replace(' ', '-').replace('(', '').replace(')', '')
+def clean_title(title):
+    """slugify the titles."""
+    return title.lower().replace(' ', '-').replace('(', '').replace(')', '')
 
-    if add_domain:
-        url = EITB_VIDEO_URL.format(playlist_title, playlist_id, video_id, video_title)
-    else:
-        internal_url = '{}/{}/{}/{}'.format(playlist_title, playlist_id, video_id, video_title)
-        url = request.route_url('episode', episode_url=internal_url)
-    return url
+
+def create_internal_video_url(playlist_title, playlist_id, video_title, video_id, request=None):
+    """create an internal url to identify an episode inside this API."""
+    playlist_title = clean_title(playlist_title)
+    video_title = clean_title(playlist_title)
+
+    internal_url = '{}/{}/{}/{}'.format(playlist_title, playlist_id, video_id, video_title)
+    return request.route_url('episode', episode_url=internal_url)
+
+
+def create_video_url(playlist_title, playlist_id, video_title, video_id):
+    """create the URL of a given episode to be used with youtube-dl."""
+    playlist_title = clean_title(playlist_title)
+    video_title = clean_title(playlist_title)
+
+    return EITB_VIDEO_URL.format(playlist_title, playlist_id, video_id, video_title)
 
 
 def get_video_urls(playlist_title, playlist_id, video_title, video_id):
+    """ helper method to get the information from youtube-dl """
     ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
     url = create_video_url(playlist_title, playlist_id, video_title, video_id)
-    import pdb; pdb.set_trace()
-
     result = ydl.extract_info(url, download=False)
-
     return result
