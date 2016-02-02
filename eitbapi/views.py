@@ -1,14 +1,14 @@
+# -*- coding: utf8 -*-
 from __future__ import unicode_literals
 from pyramid.view import view_config
-from utils import EITB_FRONT_PAGE_URL
 from utils import EITB_EPISODE_LIST_REGEX
+from utils import EITB_FRONT_PAGE_URL
 from utils import EITB_PLAYLIST_BASE_URL
-from utils import EITB_VIDEO_URL
 from utils import EITB_VIDEO_BASE_URL
+from utils import EITB_VIDEO_URL
 
-
-import requests
 import re
+import requests
 import youtube_dl
 
 
@@ -114,8 +114,27 @@ def episode(request):
 
 
 def clean_title(title):
-    """slugify the titles."""
-    return title.lower().replace(' ', '-').replace('(', '').replace(')', '')
+    """slugify the titles using the method that EITB uses in
+       the website:
+       - url: http://www.eitb.tv/resources/js/comun/comun.js
+       - method: string2url
+    """
+    translation_map = {
+        'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A', 'Å': 'A', 'Æ': 'E',
+        'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E',
+        'Ì': 'I', 'Í': 'I', 'Î': 'I', 'Ï': 'I',
+        'Ò': 'O', 'Ó': 'O', 'Ô': 'O', 'Ö': 'O',
+        'Ù': 'U', 'Ú': 'U', 'Û': 'U', 'Ü': 'U',
+        'Ñ': 'N', '?': '', '¿': '', '!': '',
+        '¡': '', ': ': '', '_': '-', 'º': '',
+        'ª': 'a', ',': '', '.': '', '(': '',
+        ')': '', '@': '', ' ': '-', '&': ''
+    }
+
+    val = title.upper()
+    for k, v in translation_map.items():
+        val = val.replace(k, v)
+    return val.lower()
 
 
 def create_internal_video_url(playlist_title, playlist_id, video_title, video_id, request=None):
@@ -136,7 +155,7 @@ def create_video_url(playlist_title, playlist_id, video_title, video_id):
 
 
 def get_video_urls(playlist_title, playlist_id, video_title, video_id):
-    """ helper method to get the information from youtube-dl """
+    """helper method to get the information from youtube-dl"""
     ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
     url = create_video_url(playlist_title, playlist_id, video_title, video_id)
     result = ydl.extract_info(url, download=False)
