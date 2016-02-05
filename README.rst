@@ -11,7 +11,7 @@ Common parts::
 
   $ git clone git@bitbucket.org:codesyntax/eitbapi
   $ virtualenv .
-  $ ./pip install zc.buildout
+  $ ./bin/pip install zc.buildout
   $ ./bin/buildout -vv
 
 
