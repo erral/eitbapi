@@ -16,7 +16,8 @@ requires = [
     'youtube-dl',
     'requests',
     'cherrypy',
-    'pastescript' ,
+    'pastescript',
+    'redis',
     ]
 
 setup(name='eitbapi',
