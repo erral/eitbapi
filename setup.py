@@ -15,6 +15,8 @@ requires = [
     'waitress',
     'youtube-dl',
     'requests',
+    'cherrypy',
+    'pastescript' ,
     ]
 
 setup(name='eitbapi',
