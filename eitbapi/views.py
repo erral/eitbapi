@@ -11,6 +11,11 @@ import re
 import requests
 import youtube_dl
 
+import os
+import redis
+
+r = redis.from_url(os.environ.get("REDIS_URL"))
+
 
 @view_config(route_name='home', renderer='templates/index.pt')
 def index(request):
@@ -56,38 +61,49 @@ def playlist(request):
         How: get the information from a pseudo-api
     """
     playlist_id = request.matchdict['playlist_id']
-    result = {
-        '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
-        '@id': request.route_url('playlist', playlist_id=playlist_id),
-        '@type': 'Playlist',
-        'parent': request.route_url('programs'),
-    }
 
-    playlist_url = EITB_PLAYLIST_BASE_URL.format(playlist_id)
-    data = requests.get(playlist_url)
-    playlist_data = data.json()
-    web_medias = playlist_data.get('web_media')
-    del playlist_data['web_media']
+    result = r.get(playlist_id, None)
 
-    playlist_data['member'] = []
-    for web_media in web_medias:
-        item = {
-            '@id': create_internal_video_url(
-                playlist_data.get('name_playlist'),
-                playlist_data.get('id_web_playlist'),
-                web_media.get('NAME_ES'),
-                web_media.get('ID_WEB_MEDIA'),
-                request=request,
-            ),
-            'title': web_media.get('NAME_ES'),
-            'description': '',
+    if result is not None:
+        print 'From redis'
+        return result
+
+    else:
+
+        result = {
+            '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
+            '@id': request.route_url('playlist', playlist_id=playlist_id),
+            '@type': 'Playlist',
+            'parent': request.route_url('programs'),
         }
-        playlist_data['member'].append(item)
-    del playlist_data['id']
 
-    result.update(playlist_data)
+        playlist_url = EITB_PLAYLIST_BASE_URL.format(playlist_id)
+        data = requests.get(playlist_url)
+        playlist_data = data.json()
+        web_medias = playlist_data.get('web_media')
+        del playlist_data['web_media']
 
-    return result
+        playlist_data['member'] = []
+        for web_media in web_medias:
+            item = {
+                '@id': create_internal_video_url(
+                    playlist_data.get('name_playlist'),
+                    playlist_data.get('id_web_playlist'),
+                    web_media.get('NAME_ES'),
+                    web_media.get('ID_WEB_MEDIA'),
+                    request=request,
+                ),
+                'title': web_media.get('NAME_ES'),
+                'description': '',
+            }
+            playlist_data['member'].append(item)
+        del playlist_data['id']
+
+        result.update(playlist_data)
+
+        r.set(playlist_id, result)
+        print 'Not from redis'
+        return result
 
 
 @view_config(route_name='episode', renderer='prettyjson')
