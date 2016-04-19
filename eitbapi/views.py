@@ -62,7 +62,7 @@ def playlist(request):
     """
     playlist_id = request.matchdict['playlist_id']
 
-    result = r.get(playlist_id, None)
+    result = r.get(playlist_id)
 
     if result is not None:
         print 'From redis'
