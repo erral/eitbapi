@@ -7,12 +7,12 @@ from utils import EITB_PLAYLIST_BASE_URL
 from utils import EITB_VIDEO_BASE_URL
 from utils import EITB_VIDEO_URL
 
+import json
+import os
 import re
+import redis
 import requests
 import youtube_dl
-
-import os
-import redis
 
 r = redis.from_url(os.environ.get("REDIS_URL"))
 
@@ -66,7 +66,7 @@ def playlist(request):
 
     if result is not None:
         print 'From redis'
-        return result
+        return json.loads(result)
 
     else:
 
@@ -101,7 +101,7 @@ def playlist(request):
 
         result.update(playlist_data)
 
-        r.set(playlist_id, result)
+        r.set(playlist_id, json.dumps(result))
         print 'Not from redis'
         return result
 
