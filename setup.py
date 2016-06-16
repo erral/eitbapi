@@ -20,6 +20,12 @@ requires = [
     'redis',
     ]
 
+tests_requires = [
+    'WebTest >= 1.3.1',
+    'pytest',
+    'pytest-cov',
+]
+
 setup(name='eitbapi',
       version='1.0',
       description='eitbapi',
@@ -38,7 +44,8 @@ setup(name='eitbapi',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
-      tests_require=requires,
+      tests_require=tests_requires,
+      extras_require={'testing': tests_requires},
       test_suite="eitbapi",
       entry_points="""\
       [paste.app_factory]

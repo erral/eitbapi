@@ -14,7 +14,10 @@ import redis
 import requests
 import youtube_dl
 
-r = redis.from_url(os.environ.get("REDIS_URL"))
+if os.environ.get('REDIS_URL'):
+    r = redis.from_url(os.environ.get("REDIS_URL"))
+else:
+    r = {}
 
 
 @view_config(route_name='home', renderer='templates/index.pt')
@@ -62,8 +65,11 @@ def playlist(request):
     """
     playlist_id = request.matchdict['playlist_id']
 
-    result = r.get(playlist_id)
-    print result
+    try:
+        result = r.get(playlist_id)
+    except:
+        result = None
+
     if result is not None:
         print 'From redis'
         return json.loads(result)

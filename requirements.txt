@@ -20,6 +20,5 @@ venusian==1.0
 waitress==0.9.0
 wsgiref==0.1.2
 youtube-dl==2016.4.19
-zc.buildout==2.5.0
 zope.deprecation==4.1.2
 zope.interface==4.1.3

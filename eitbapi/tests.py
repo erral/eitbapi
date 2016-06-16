@@ -3,15 +3,16 @@ import unittest
 from pyramid import testing
 
 
-class ViewTests(unittest.TestCase):
+class TutorialViewTests(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp()
 
     def tearDown(self):
         testing.tearDown()
 
-    def test_my_view(self):
-        from .views import my_view
+    def test_index(self):
+        from eitbapi.views import index
+
         request = testing.DummyRequest()
-        info = my_view(request)
-        self.assertEqual(info['project'], 'eitbapi')
+        response = index(request)
+        self.assertEqual(type(response), dict)
