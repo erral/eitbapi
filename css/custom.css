@@ -1,0 +1,11 @@
+body .reveal {
+    font-family: "Merryweather", sans-serif;
+}
+
+h1, h2 {
+    font-family: "Oswald";
+}
+
+section img {
+    border: 0px !important
+}
