@@ -36,7 +36,7 @@ def programs(request):
     result = {
         '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
         '@id': request.route_url('programs'),
-        '@type': 'SiteRoot',
+        '@type': 'TV',
         'parent': {},
     }
 
@@ -49,6 +49,7 @@ def programs(request):
 
         results.append({
             '@id': request.route_url('playlist', playlist_id=id),
+            '@type': 'Playlist',
             'title': scrapedtitle,
             'description': '',
         })
@@ -99,15 +100,18 @@ def playlist(request):
                     web_media.get('ID_WEB_MEDIA'),
                     request=request,
                 ),
+                '@type': 'Episode',
                 'title': web_media.get('NAME_ES'),
-                'description': '',
+                'description': web_media.get('SHORT_DESC_ES', ''),
             }
             playlist_data['member'].append(item)
         del playlist_data['id']
 
         result.update(playlist_data)
-
-        r.set(playlist_id, json.dumps(result))
+        try:
+            r.set(playlist_id, json.dumps(result))
+        except:
+            pass
         print 'Not from redis'
         return result
 
