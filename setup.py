@@ -18,7 +18,7 @@ requires = [
     'cherrypy',
     'pastescript',
     'redis',
-    ]
+]
 
 tests_requires = [
     'WebTest >= 1.3.1',
@@ -31,15 +31,15 @@ setup(name='eitbapi',
       description='eitbapi',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
-        "Programming Language :: Python",
-        "Framework :: Pyramid",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+          "Programming Language :: Python",
+          "Framework :: Pyramid",
+          "Topic :: Internet :: WWW/HTTP",
+          "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
-      author='',
-      author_email='',
-      url='',
-      keywords='web pyramid pylons',
+      author='Mikel Larreategi',
+      author_email='larreategi@eibar.org',
+      url='https://github.com/erral/eitbapi',
+      keywords='web pyramid pylons eitb video api tv',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
