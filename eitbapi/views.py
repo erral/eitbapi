@@ -122,21 +122,38 @@ def episode(request):
         How: use youtube-dl to get the information
     """
     episode_url = request.matchdict['episode_url']
-    url = EITB_VIDEO_BASE_URL + episode_url
 
-    playlist_title, playlist_id, video_title, video_id = episode_url.split('/')
-    result = {
-        '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
-        '@id': request.route_url('episode', episode_url=episode_url),
-        '@type': 'Episode',
-        'parent': request.route_url('playlist', playlist_id=playlist_id),
-    }
+    try:
+        result = r.get(episode_url)
+    except:
+        result = None
 
-    ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
-    video_data = ydl.extract_info(url, download=False)
+    if result is not None:
+        print 'Episode data from REDIS'
+        return json.loads(result)
+    else:
+        print 'Episode data not present in REDIS'
+        url = EITB_VIDEO_BASE_URL + episode_url
 
-    result.update(video_data)
-    return result
+        playlist_title, playlist_id, video_title, video_id = episode_url.split('/')
+        result = {
+            '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
+            '@id': request.route_url('episode', episode_url=episode_url),
+            '@type': 'Episode',
+            'parent': request.route_url('playlist', playlist_id=playlist_id),
+        }
+
+        ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
+        video_data = ydl.extract_info(url, download=False)
+
+        result.update(video_data)
+
+        try:
+            r.set(episode_url, json.dumps(result))
+        except:
+            pass
+
+        return result
 
 
 def clean_title(title):
