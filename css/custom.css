@@ -1,11 +1,16 @@
-body .reveal {
-    font-family: "Merryweather", sans-serif;
+.reveal {
+    font-family: "Merriweather", Helvetica, sans-serif;
 }
 
-h1, h2 {
-    font-family: "Oswald";
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4,
+.reveal h5,
+.reveal h6 {
+    font-family: "Oswald", Helvetica, sans-serif;;
 }
 
-section img {
+.reveal img {
     border: 0px !important
 }
