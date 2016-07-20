@@ -9,7 +9,7 @@ Installation
 
 It will install buildout and download the dependencies::
 
-  $ git clone git@bitbucket.org:codesyntax/eitbapi
+  $ git clone git@github.com:erral/eitbapi
   $ virtualenv .
   $ ./bin/pip install zc.buildout
   $ ./bin/buildout -vv
