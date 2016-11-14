@@ -48,8 +48,13 @@
             </p>
             <p class="lead">
               <a class="btn btn-default btn-lg" href="${request.route_url('programs')}">
-                Programa zerrenda ikusi
+                Telebista programa zerrenda ikusi
               </a>
+              <br />
+              <a class="btn btn-default btn-lg" href="${request.route_url('radio')}">
+                Irrati programa zerrenda ikusi
+              </a>
+
               <ul>
                   <li>
                       Chrome/Chromium-en ondo ikusteko <a href="https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?utm_source=chrome-app-launcher-info-dialog">instalatu JSON Formatter</a>

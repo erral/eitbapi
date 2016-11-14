@@ -1,11 +1,14 @@
 # -*- coding: utf8 -*-
 from __future__ import unicode_literals
+from bs4 import BeautifulSoup
 from pyramid.view import view_config
 from utils import EITB_EPISODE_LIST_REGEX
 from utils import EITB_FRONT_PAGE_URL
 from utils import EITB_PLAYLIST_BASE_URL
 from utils import EITB_VIDEO_BASE_URL
 from utils import EITB_VIDEO_URL
+from utils import EITB_RADIO_ITEMS_URL
+from utils import EITB_BASE_URL
 
 import json
 import os
@@ -59,6 +62,58 @@ def programs(request):
     return result
 
 
+def extract_radio_info_from_url(url):
+    """ /eu/irratia/gaztea/akabo-bakea/3601966/" """
+    _, lang, _, radio, lowertitle, id, _ = url.split('/')
+    return dict(
+        id=url[1:],
+        title=lowertitle.replace('-', ' ').capitalize(),
+        radio=radio.replace('-', ' ').capitalize(),
+    )
+
+
+@view_config(route_name='radio', renderer='prettyjson')
+def radio(request):
+    """get all information about all the programs.
+    How: scrap the website and look for the javascript links.
+    """
+    result = {
+        '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
+        '@id': request.route_url('radio'),
+        '@type': 'Radio',
+        'parent': {},
+    }
+
+    results = []
+
+    data = requests.get(EITB_RADIO_ITEMS_URL)
+    soup = BeautifulSoup(data.text, "html.parser")
+    results = []
+    for li in soup.find_all('li', class_='submenutemp'):
+        name = li.find('span', class_='nombre_temporada')
+        program_name = u''
+        if name:
+            program_name = name.text
+
+        for link in li.find_all('a'):
+            if link.get('href').startswith('/eu/irratia/') or link.get('href').startswith('/es/radio/'):
+                info = extract_radio_info_from_url(link.get('href'))
+                id = info.get('id')
+                title = link.text
+                radio = info.get('radio')
+                results.append({
+                    '@id': request.route_url('radioplaylist', playlist_id=id),
+                    '@type': 'Radio Playlist',
+                    'title': u'{} - {}'.format(program_name, title),
+                    'description': '',
+                    'radio': radio
+                })
+
+    result['member'] = results
+
+    return result
+
+
 @view_config(route_name='playlist', renderer='prettyjson')
 def playlist(request):
     """ get all the information about the given program.
@@ -101,8 +156,10 @@ def playlist(request):
                     request=request,
                 ),
                 '@type': 'Episode',
-                'title': web_media.get('NAME_ES'),
-                'description': web_media.get('SHORT_DESC_ES', ''),
+                'title': web_media.get('NAME_EU'),
+                'title_es': web_media.get('NAME_ES'),
+                'description': web_media.get('SHORT_DESC_EU', ''),
+                'description_es': web_media.get('SHORT_DESC_ES', ''),
             }
             playlist_data['member'].append(item)
         del playlist_data['id']
@@ -113,6 +170,52 @@ def playlist(request):
         except:
             pass
         print 'Not from redis'
+        return result
+
+
+@view_config(route_name='radioplaylist', renderer='prettyjson')
+def radioplaylist(request):
+    """ get all the information about the given program.
+    """
+    playlist_id = request.matchdict['playlist_id']
+
+    try:
+        result = r.get(playlist_id)
+    except:
+        result = None
+
+    if result is not None:
+        print 'From redis'
+        return json.loads(result)
+
+    else:
+        result = {
+            '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
+            '@id': request.route_url('radioplaylist', playlist_id=playlist_id),
+            '@type': 'Radio Playlist',
+            'parent': request.route_url('radio'),
+        }
+        results = []
+        data = requests.get(EITB_BASE_URL + playlist_id)
+        soup = BeautifulSoup(data.text, "html.parser")
+        for li in soup.find_all('li', class_='audio_uno'):
+            title_p, date_p, download_p = li.find_all('p')
+            title = title_p.find('a').get('original-title')
+            date, duration = date_p.text.split()
+            url = download_p.find('a').get('href')
+            duration = duration.replace('(', '').replace(')', '')
+            item = {
+                '@id': '',
+                '@type': 'Radio Program',
+                '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
+                'title': title,
+                'date': date,
+                'duration': duration,
+                'url': url,
+            }
+            results.append(item)
+
+        result['member'] = results
         return result
 
 
