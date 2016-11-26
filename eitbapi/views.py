@@ -89,8 +89,9 @@ def radio(request):
     data = requests.get(EITB_RADIO_ITEMS_URL)
     soup = BeautifulSoup(data.text, "html.parser")
     results = []
-    for li in soup.find_all('li', class_='sbmntmp'):
-        name = li.find('span', class_='tmp')
+    programsoup = soup.find_all('li', class_='submenu', rel='programas_az')[0]
+    for li in programsoup.find_all('li', class_='sbmntmp'):
+        name = li.find('span', class_='nomtmp')
         program_name = u''
         if name:
             program_name = name.text
