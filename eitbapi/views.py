@@ -2,13 +2,13 @@
 from __future__ import unicode_literals
 from bs4 import BeautifulSoup
 from pyramid.view import view_config
-from utils import EITB_EPISODE_LIST_REGEX
-from utils import EITB_FRONT_PAGE_URL
-from utils import EITB_PLAYLIST_BASE_URL
-from utils import EITB_VIDEO_BASE_URL
-from utils import EITB_VIDEO_URL
-from utils import EITB_RADIO_ITEMS_URL
-from utils import EITB_BASE_URL
+from eitbapi.utils import EITB_EPISODE_LIST_REGEX
+from eitbapi.utils import EITB_FRONT_PAGE_URL
+from eitbapi.utils import EITB_PLAYLIST_BASE_URL
+from eitbapi.utils import EITB_VIDEO_BASE_URL
+from eitbapi.utils import EITB_VIDEO_URL
+from eitbapi.utils import EITB_RADIO_ITEMS_URL
+from eitbapi.utils import EITB_BASE_URL
 
 import json
 import os
@@ -128,7 +128,6 @@ def playlist(request):
         result = None
 
     if result is not None:
-        print 'From redis'
         return json.loads(result)
 
     else:
@@ -170,7 +169,6 @@ def playlist(request):
             r.set(playlist_id, json.dumps(result))
         except:
             pass
-        print 'Not from redis'
         return result
 
 
@@ -186,7 +184,6 @@ def radioplaylist(request):
         result = None
 
     if result is not None:
-        print 'From redis'
         return json.loads(result)
 
     else:
@@ -233,10 +230,8 @@ def episode(request):
         result = None
 
     if result is not None:
-        print 'Episode data from REDIS'
         return json.loads(result)
     else:
-        print 'Episode data not present in REDIS'
         url = EITB_VIDEO_BASE_URL + episode_url
 
         playlist_title, playlist_id, video_title, video_id = episode_url.split('/')
