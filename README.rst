@@ -1,8 +1,7 @@
 eitbapi
 =======
 
-A pyramid_ app to expose an API for `EITB Nahieran`_
-
+A pyramid_ app to expose an API for `EITB Nahieran`_ (unofficial)
 
 Installation
 =============
