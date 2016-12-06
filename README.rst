@@ -3,7 +3,6 @@ eitbapi
 
 A pyramid_ app to expose an API for `EITB Nahieran`_ (unofficial)
 
-
 .. image:: https://travis-ci.org/erral/eitbapi.svg?branch=master
     :target: https://travis-ci.org/erral/eitbapi
 
