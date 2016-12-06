@@ -8,18 +8,6 @@ with open(os.path.join(here, 'README.rst')) as f:
 with open(os.path.join(here, 'CHANGES.txt')) as f:
     CHANGES = f.read()
 
-requires = [
-    'pyramid',
-    'pyramid_chameleon',
-    'pyramid_debugtoolbar',
-    'waitress',
-    'youtube-dl',
-    'requests',
-    'cherrypy',
-    'pastescript',
-    'redis',
-]
-
 tests_requires = [
     'WebTest >= 1.3.1',
     'pytest',
@@ -44,7 +32,6 @@ setup(name='eitbapi',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
-      install_requires=requires,
       tests_require=tests_requires,
       extras_require={'testing': tests_requires},
       test_suite="eitbapi",
