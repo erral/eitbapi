@@ -12,3 +12,7 @@ class FunctionalTests(unittest.TestCase):
     def test_root(self):
         res = self.testapp.get('/', status=200)
         self.assertTrue(b'Pyramid' not in res.body)
+
+    def test_programs(self):
+        res = self.testapp.get('/playlist', status=200)
+        self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
