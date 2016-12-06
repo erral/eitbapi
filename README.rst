@@ -7,24 +7,10 @@ A pyramid_ app to expose an API for `EITB Nahieran`_
 Installation
 =============
 
-It will install buildout and download the dependencies::
+To run and install localy, create a virtualenv first and then::
 
-  $ git clone git@github.com:erral/eitbapi
-  $ virtualenv .
-  $ ./bin/pip install zc.buildout
-  $ ./bin/buildout -vv
-
-
-To run in development mode::
-
-  $ ./bin/pserve development.ini --reload
-
-To run in production mode::
-
-  $ ./bin/supervisord
-
-Link the **etc/nginx-vh-conf** file to your nginx's configuration directory
-(usually /etc/nginx/conf.d)
+  $ pip install -e .
+  $ pserver development.ini --reload
 
 Add a Redis_ instance to provide caching of results (optional)
 ----------------------------------------------------------------
