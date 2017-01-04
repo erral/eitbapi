@@ -50,14 +50,16 @@ def programs(request):
         if title1 != title2:
             scrapedtitle = scrapedtitle + " - " + title2
 
-        results.append({
+        data = {
             '@id': request.route_url('playlist', playlist_id=id),
             '@type': 'Playlist',
             'title': scrapedtitle,
             'description': '',
-        })
+        }
+        if data not in results:
+            results.append(data)
 
-    result['member'] = results
+    result['member'] = sorted(results, key=lambda x: x.get('title', '').lower())
 
     return result
 
@@ -110,7 +112,7 @@ def radio(request):
                     'radio': radio
                 })
 
-    result['member'] = results
+    result['member'] = sorted(results, key=lambda x: x.get('title', '').lower())
 
     return result
 
@@ -211,9 +213,10 @@ def radioplaylist(request):
                 'duration': duration,
                 'url': url,
             }
-            results.append(item)
+            if item not in results:
+                results.append(item)
 
-        result['member'] = results
+        result['member'] = sorted(results, key=lambda x: x.get('date', ''), reverse=True)
         return result
 
 
