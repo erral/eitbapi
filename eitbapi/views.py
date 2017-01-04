@@ -186,7 +186,7 @@ def playlist(request):
                 'description': web_media.get('SHORT_DESC_{}'.format(language)),
                 'description_eu': web_media.get('SHORT_DESC_EU', ''),
                 'description_es': web_media.get('SHORT_DESC_ES', ''),
-                'publicaction_date': pubdateiso,
+                'publication_date': pubdateiso,
                 'broadcast_date': broadcastdateiso,
                 'episode_image': web_media.get('STILL_URL', ''),
                 'episode_image_thumbnail': web_media.get('THUMBNAIL_URL', ''),
