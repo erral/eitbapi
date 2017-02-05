@@ -10,12 +10,15 @@ from eitbapi.utils import EITB_VIDEO_URL
 from eitbapi.utils import EITB_RADIO_ITEMS_URL
 from eitbapi.utils import EITB_BASE_URL
 
+import datetime
 import json
 import os
+import pytz
 import re
 import redis
 import requests
 import youtube_dl
+
 
 if os.environ.get('REDIS_URL'):
     r = redis.from_url(os.environ.get("REDIS_URL"))
@@ -50,14 +53,16 @@ def programs(request):
         if title1 != title2:
             scrapedtitle = scrapedtitle + " - " + title2
 
-        results.append({
+        data = {
             '@id': request.route_url('playlist', playlist_id=id),
             '@type': 'Playlist',
             'title': scrapedtitle,
             'description': '',
-        })
+        }
+        if data not in results:
+            results.append(data)
 
-    result['member'] = results
+    result['member'] = sorted(results, key=lambda x: x.get('title', '').lower())
 
     return result
 
@@ -110,7 +115,7 @@ def radio(request):
                     'radio': radio
                 })
 
-    result['member'] = results
+    result['member'] = sorted(results, key=lambda x: x.get('title', '').lower())
 
     return result
 
@@ -149,8 +154,27 @@ def playlist(request):
         web_medias = playlist_data.get('web_media')
         del playlist_data['web_media']
 
-        playlist_data['member'] = []
+        member = []
         for web_media in web_medias:
+            language = web_media.get('IDIOMA', '')
+            pubdatestr = web_media.get('PUB_DATE', '')
+            broadcastdatestr = web_media.get('BROADCST_DATE', '')
+            dateformat = '%Y-%m-%d %H:%M:%S'
+
+            tz = pytz.timezone('Europe/Madrid')
+            try:
+                pubdate = datetime.datetime.strptime(pubdatestr, dateformat)
+                pubdate = tz.localize(pubdate)
+                pubdateiso = pubdate.isoformat()
+            except:
+                pubdateiso = pubdatestr
+
+            try:
+                broadcastdate = datetime.datetime.strptime(broadcastdatestr, dateformat)
+                broadcastdate = tz.localize(broadcastdate)
+                broadcastdateiso = broadcastdate.isoformat()
+            except:
+                broadcastdateiso = broadcastdatestr
             item = {
                 '@id': create_internal_video_url(
                     playlist_data.get('name_playlist'),
@@ -160,12 +184,22 @@ def playlist(request):
                     request=request,
                 ),
                 '@type': 'Episode',
-                'title': web_media.get('NAME_EU'),
+                'title': web_media.get('NAME_{}'.format(language)),
+                'title_eu': web_media.get('NAME_EU'),
                 'title_es': web_media.get('NAME_ES'),
-                'description': web_media.get('SHORT_DESC_EU', ''),
+                'description': web_media.get('SHORT_DESC_{}'.format(language)),
+                'description_eu': web_media.get('SHORT_DESC_EU', ''),
                 'description_es': web_media.get('SHORT_DESC_ES', ''),
+                'publication_date': pubdateiso,
+                'broadcast_date': broadcastdateiso,
+                'episode_image': web_media.get('STILL_URL', ''),
+                'episode_image_thumbnail': web_media.get('THUMBNAIL_URL', ''),
+                'language': language.lower(),
             }
-            playlist_data['member'].append(item)
+            if item not in member:
+                member.append(item)
+        playlist_data['member'] = sorted(member, key=lambda x: x.get('broadcast_date'), reverse=True)
+
         del playlist_data['id']
 
         result.update(playlist_data)
@@ -215,9 +249,10 @@ def radioplaylist(request):
                 'duration': duration,
                 'url': url,
             }
-            results.append(item)
+            if item not in results:
+                results.append(item)
 
-        result['member'] = results
+        result['member'] = sorted(results, key=lambda x: x.get('date', ''), reverse=True)
         return result
 
 
@@ -278,7 +313,7 @@ def clean_title(title):
         'Ò': 'O', 'Ó': 'O', 'Ô': 'O', 'Ö': 'O',
         'Ù': 'U', 'Ú': 'U', 'Û': 'U', 'Ü': 'U',
         'Ñ': 'N', '?': '', '¿': '', '!': '',
-        '¡': '', ': ': '', '_': '-', 'º': '',
+        '¡': '', ':': '', '_': '-', 'º': '',
         'ª': 'a', ',': '', '.': '', '(': '',
         ')': '', '@': '', ' ': '-', '&': ''
     }
