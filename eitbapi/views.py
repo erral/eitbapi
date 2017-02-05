@@ -145,8 +145,12 @@ def playlist(request):
         }
 
         playlist_url = EITB_PLAYLIST_BASE_URL.format(playlist_id)
-        data = requests.get(playlist_url)
-        playlist_data = data.json()
+        try:
+            data = requests.get(playlist_url)
+            playlist_data = data.json()
+        except ValueError:
+            return result
+            
         web_medias = playlist_data.get('web_media')
         del playlist_data['web_media']
 
@@ -268,8 +272,11 @@ def episode(request):
         return json.loads(result)
     else:
         url = EITB_VIDEO_BASE_URL + episode_url
+        try:
+            playlist_title, playlist_id, video_title, video_id = episode_url.split('/')
+        except ValueError:
+            return {}
 
-        playlist_title, playlist_id, video_title, video_id = episode_url.split('/')
         result = {
             '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
             '@id': request.route_url('episode', episode_url=episode_url),
@@ -277,8 +284,11 @@ def episode(request):
             'parent': request.route_url('playlist', playlist_id=playlist_id),
         }
 
-        ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
-        video_data = ydl.extract_info(url, download=False)
+        try:
+            ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
+            video_data = ydl.extract_info(url, download=False)
+        except youtube_dl.DownloadError:
+            return result
 
         result.update(video_data)
 

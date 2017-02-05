@@ -8,9 +8,9 @@ install:
   - pip install -r requirements.txt
   - pip install -e ".[testing]"
   - pip install -e .
-  - pip install coveralls
 # command to run tests
 script:
-  - coverage run --source=eitbapi setup.py test
+  coverage run --source=eitbapi setup.py test
 after_success:
+  - pip install coveralls
   - coveralls
