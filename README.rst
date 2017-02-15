@@ -9,6 +9,13 @@ A pyramid_ app to expose an API for `EITB Nahieran`_ (unofficial)
 .. image:: https://coveralls.io/repos/github/erral/eitbapi/badge.svg
     :target: https://coveralls.io/github/erral/eitbapi
 
+
+View API online
+===============
+
+https://still-castle-99749.herokuapp.com/
+
+
 Installation
 =============
 
