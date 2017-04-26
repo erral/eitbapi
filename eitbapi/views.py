@@ -204,7 +204,7 @@ def playlist(request):
 
         result.update(playlist_data)
         try:
-            r.set(playlist_id, json.dumps(result))
+            r.set(playlist_id, json.dumps(result), ex=3600)
         except:
             pass
         return result
@@ -293,7 +293,7 @@ def episode(request):
         result.update(video_data)
 
         try:
-            r.set(episode_url, json.dumps(result))
+            r.set(episode_url, json.dumps(result), ex=3600)
         except:
             pass
 
