@@ -127,10 +127,11 @@ def playlist(request):
     """
     playlist_id = request.matchdict['playlist_id']
 
-    try:
-        result = r.get(playlist_id)
-    except:
-        result = None
+    # try:
+    #     result = r.get(playlist_id)
+    # except:
+    #     result = None
+    result = None
 
     if result is not None:
         return json.loads(result)
@@ -150,7 +151,7 @@ def playlist(request):
             playlist_data = data.json()
         except ValueError:
             return result
-            
+
         web_medias = playlist_data.get('web_media')
         del playlist_data['web_media']
 
@@ -216,10 +217,11 @@ def radioplaylist(request):
     """
     playlist_id = request.matchdict['playlist_id']
 
-    try:
-        result = r.get(playlist_id)
-    except:
-        result = None
+    # try:
+    #     result = r.get(playlist_id)
+    # except:
+    #     result = None
+    result = None
 
     if result is not None:
         return json.loads(result)
@@ -263,10 +265,11 @@ def episode(request):
     """
     episode_url = request.matchdict['episode_url']
 
-    try:
-        result = r.get(episode_url)
-    except:
-        result = None
+    # try:
+    #     result = r.get(episode_url)
+    # except:
+    #     result = None
+    result = None
 
     if result is not None:
         return json.loads(result)
