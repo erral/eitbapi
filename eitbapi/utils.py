@@ -9,6 +9,7 @@ EITB_BASE_URL = "http://www.eitb.tv/"
 
 EITB_PROGRAM_LIST_HTML_URL_0 = 'http://www.eitb.tv/eu/menu/getMenu/tv/0/'
 EITB_PROGRAM_LIST_HTML_URL_1 = 'http://www.eitb.tv/eu/menu/getMenu/tv/1/'
+EITB_RADIO_PROGRAM_LIST_HTML_URL_1 = 'http://www.eitb.tv/eu/menu/getMenu/radio/0/'
 
 
 def safe_unicode(text, charset='utf-8'):

@@ -11,6 +11,7 @@ from eitbapi.utils import EITB_RADIO_ITEMS_URL
 from eitbapi.utils import EITB_BASE_URL
 from eitbapi.utils import EITB_PROGRAM_LIST_HTML_URL_0
 from eitbapi.utils import EITB_PROGRAM_LIST_HTML_URL_1
+from eitbapi.utils import EITB_RADIO_PROGRAM_LIST_HTML_URL_1
 from eitbapi.utils import safe_unicode
 
 import base64
@@ -100,8 +101,10 @@ def radio(request):
 
     results = []
 
-    data = requests.get(EITB_RADIO_ITEMS_URL)
-    soup = BeautifulSoup(data.text, "html.parser")
+    data = requests.get(EITB_RADIO_PROGRAM_LIST_HTML_URL_1)
+    text = base64.decodestring(data.json().get('content', ''))
+
+    soup = BeautifulSoup(text, "html.parser")
     results = []
     programsoup = soup.find_all('li', class_='submenu', rel='programas_az')[0]
     for li in programsoup.find_all('li', class_='sbmntmp'):
