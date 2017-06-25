@@ -9,7 +9,12 @@ from eitbapi.utils import EITB_VIDEO_BASE_URL
 from eitbapi.utils import EITB_VIDEO_URL
 from eitbapi.utils import EITB_RADIO_ITEMS_URL
 from eitbapi.utils import EITB_BASE_URL
+from eitbapi.utils import EITB_PROGRAM_LIST_HTML_URL_0
+from eitbapi.utils import EITB_PROGRAM_LIST_HTML_URL_1
+from eitbapi.utils import EITB_RADIO_PROGRAM_LIST_HTML_URL_1
+from eitbapi.utils import safe_unicode
 
+import base64
 import datetime
 import json
 import os
@@ -36,8 +41,13 @@ def programs(request):
     """get all information about all the programs.
     How: scrap the website and look for the javascript links.
     """
-    data = requests.get(EITB_FRONT_PAGE_URL)
-    matches = re.compile(EITB_EPISODE_LIST_REGEX, re.DOTALL).findall(data.text)
+    data = requests.get(EITB_PROGRAM_LIST_HTML_URL_0)
+    text = base64.decodestring(data.json().get('content', ''))
+
+    data = requests.get(EITB_PROGRAM_LIST_HTML_URL_1)
+    text += base64.decodestring(data.json().get('content', ''))
+
+    matches = re.compile(EITB_EPISODE_LIST_REGEX, re.DOTALL).findall(text)
 
     result = {
         '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
@@ -51,18 +61,18 @@ def programs(request):
     for id, title1, title2 in matches:
         scrapedtitle = title1
         if title1 != title2:
-            scrapedtitle = scrapedtitle + " - " + title2
+            scrapedtitle = safe_unicode(scrapedtitle, 'iso-8859-15') + u" - " + safe_unicode(title2, 'iso-8859-15')
 
         data = {
             '@id': request.route_url('playlist', playlist_id=id),
             '@type': 'Playlist',
-            'title': scrapedtitle,
+            'title': safe_unicode(scrapedtitle, 'iso-8859-1'),
             'description': '',
         }
         if data not in results:
             results.append(data)
 
-    result['member'] = sorted(results, key=lambda x: x.get('title', '').lower())
+    result['member'] = sorted(results, key=lambda x: x.get('title', u'').lower())
 
     return result
 
@@ -91,8 +101,10 @@ def radio(request):
 
     results = []
 
-    data = requests.get(EITB_RADIO_ITEMS_URL)
-    soup = BeautifulSoup(data.text, "html.parser")
+    data = requests.get(EITB_RADIO_PROGRAM_LIST_HTML_URL_1)
+    text = base64.decodestring(data.json().get('content', ''))
+
+    soup = BeautifulSoup(text, "html.parser")
     results = []
     programsoup = soup.find_all('li', class_='submenu', rel='programas_az')[0]
     for li in programsoup.find_all('li', class_='sbmntmp'):
