@@ -9,10 +9,9 @@ from eitbapi.utils import EITB_VIDEO_BASE_URL
 from eitbapi.utils import EITB_VIDEO_URL
 from eitbapi.utils import EITB_RADIO_ITEMS_URL
 from eitbapi.utils import EITB_BASE_URL
-from eitbapi.utils import EITB_PROGRAM_LIST_HTML_URL_0
-from eitbapi.utils import EITB_PROGRAM_LIST_HTML_URL_1
 from eitbapi.utils import EITB_RADIO_PROGRAM_LIST_HTML_URL_1
 from eitbapi.utils import safe_unicode
+from eitbapi.utils import get_program_data
 
 import base64
 import datetime
@@ -23,6 +22,7 @@ import re
 import redis
 import requests
 import youtube_dl
+import xml
 
 
 if os.environ.get('REDIS_URL'):
@@ -41,13 +41,7 @@ def programs(request):
     """get all information about all the programs.
     How: scrap the website and look for the javascript links.
     """
-    data = requests.get(EITB_PROGRAM_LIST_HTML_URL_0)
-    text = base64.decodestring(data.json().get('content', ''))
-
-    data = requests.get(EITB_PROGRAM_LIST_HTML_URL_1)
-    text += base64.decodestring(data.json().get('content', ''))
-
-    matches = re.compile(EITB_EPISODE_LIST_REGEX, re.DOTALL).findall(text)
+    menudata = get_program_data()
 
     result = {
         '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
@@ -58,15 +52,11 @@ def programs(request):
 
     results = []
 
-    for id, title1, title2 in matches:
-        scrapedtitle = title1
-        if title1 != title2:
-            scrapedtitle = safe_unicode(scrapedtitle, 'iso-8859-15') + u" - " + safe_unicode(title2, 'iso-8859-15')
-
+    for item in menudata:
         data = {
-            '@id': request.route_url('playlist', playlist_id=id),
+            '@id': request.route_url('playlist', playlist_id=item.get('id')),
             '@type': 'Playlist',
-            'title': safe_unicode(scrapedtitle, 'iso-8859-1'),
+            'title': safe_unicode(item.get('title'), 'iso-8859-1'),
             'description': '',
         }
         if data not in results:
