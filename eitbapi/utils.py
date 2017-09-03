@@ -52,7 +52,7 @@ def get_tv_program_data():
 
     for item in submenudict.values():
         subhash = item.get('submenu', {}).get('hash')
-        subsubmenudata = requests.get(EITB_PROGRAM_LIST_XML_URL + '/' + subhash)
+        subsubmenudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL + '/' + subhash)
         subsubmenudict = xml_to_dict(subsubmenudata.content)
         for program in subsubmenudict.values():
             data = {}
