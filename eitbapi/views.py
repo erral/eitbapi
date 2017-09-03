@@ -9,9 +9,9 @@ from eitbapi.utils import EITB_VIDEO_BASE_URL
 from eitbapi.utils import EITB_VIDEO_URL
 from eitbapi.utils import EITB_RADIO_ITEMS_URL
 from eitbapi.utils import EITB_BASE_URL
-from eitbapi.utils import EITB_RADIO_PROGRAM_LIST_HTML_URL_1
 from eitbapi.utils import safe_unicode
 from eitbapi.utils import get_tv_program_data
+from eitbapi.utils import get_radio_program_data
 
 import base64
 import datetime
@@ -82,42 +82,28 @@ def radio(request):
     """get all information about all the programs.
     How: scrap the website and look for the javascript links.
     """
+    menudata = get_radio_program_data()
+
     result = {
         '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
-        '@id': request.route_url('radio'),
+        '@id': request.route_url('programs'),
         '@type': 'Radio',
         'parent': {},
     }
 
     results = []
 
-    data = requests.get(EITB_RADIO_PROGRAM_LIST_HTML_URL_1)
-    text = base64.decodestring(data.json().get('content', ''))
+    for item in menudata:
+        data = {
+            '@id': request.route_url('radioplaylist', playlist_id=item.get('id')),
+            '@type': 'Radio Playlist',
+            'title': safe_unicode(item.get('title'), 'iso-8859-1'),
+            'description': '',
+        }
+        if data not in results:
+            results.append(data)
 
-    soup = BeautifulSoup(text, "html.parser")
-    results = []
-    programsoup = soup.find_all('li', class_='submenu', rel='programas_az')[0]
-    for li in programsoup.find_all('li', class_='sbmntmp'):
-        name = li.find('span', class_='nomtmp')
-        program_name = u''
-        if name:
-            program_name = name.text
-
-        for link in li.find_all('a'):
-            if link.get('href').startswith('/eu/irratia/') or link.get('href').startswith('/es/radio/'):
-                info = extract_radio_info_from_url(link.get('href'))
-                id = info.get('id')
-                title = link.text
-                radio = info.get('radio')
-                results.append({
-                    '@id': request.route_url('radioplaylist', playlist_id=id),
-                    '@type': 'Radio Playlist',
-                    'title': u'{} - {}'.format(program_name, title),
-                    'description': '',
-                    'radio': radio
-                })
-
-    result['member'] = sorted(results, key=lambda x: x.get('title', '').lower())
+    result['member'] = sorted(results, key=lambda x: x.get('title', u'').lower())
 
     return result
 
