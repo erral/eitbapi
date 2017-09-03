@@ -18,21 +18,17 @@ class FunctionalTests(unittest.TestCase):
         self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
 
     def test_program_playlist(self):
-        res = self.testapp.get('/playlist/1021', status=200)
-        self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
-
-    def test_wrong_program_playlist_episode(self):
-        res = self.testapp.get('/episode/episode-title', status=200)
+        res = self.testapp.get('/playlist/4105019553001', status=200)
         self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
 
     def test_program_playlist_episode(self):
-        res = self.testapp.get('/episode/episode-title/playlist-id/video-title/video-id', status=200)
+        res = self.testapp.get('/episode/heltzean/927/23221/heltzean', status=200)
         self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
 
     def test_radio(self):
         res = self.testapp.get('/radio', status=200)
         self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
 
-    def test_radio_playliost(self):
-        res = self.testapp.get('/rplaylist/one-radio-prorgram', status=200)
+    def test_radio_playlist(self):
+        res = self.testapp.get('/rplaylist/es/radio/radio-vitoria/5-minutos-mas/4346748/', status=200)
         self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
