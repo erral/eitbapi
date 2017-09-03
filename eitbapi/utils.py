@@ -43,7 +43,7 @@ def xml_to_dict(data):
 
     return d
 
-def get_program_data():
+def get_tv_program_data():
     results = []
     menudata = requests.get(EITB_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)

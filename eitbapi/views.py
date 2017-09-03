@@ -11,7 +11,7 @@ from eitbapi.utils import EITB_RADIO_ITEMS_URL
 from eitbapi.utils import EITB_BASE_URL
 from eitbapi.utils import EITB_RADIO_PROGRAM_LIST_HTML_URL_1
 from eitbapi.utils import safe_unicode
-from eitbapi.utils import get_program_data
+from eitbapi.utils import get_tv_program_data
 
 import base64
 import datetime
@@ -41,7 +41,7 @@ def programs(request):
     """get all information about all the programs.
     How: scrap the website and look for the javascript links.
     """
-    menudata = get_program_data()
+    menudata = get_tv_program_data()
 
     result = {
         '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
