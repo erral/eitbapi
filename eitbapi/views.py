@@ -50,7 +50,7 @@ def programs(request):
         data = {
             '@id': request.route_url('playlist', playlist_id=item.get('id')),
             '@type': 'Playlist',
-            'title': safe_encode(item.get('title'), 'iso-8859-1'),
+            'title': safe_encode(item.get('title')),
             'description': '',
         }
         if data not in results:
@@ -91,7 +91,7 @@ def radio(request):
         data = {
             '@id': request.route_url('radioplaylist', playlist_id=item.get('id')),
             '@type': 'Radio Playlist',
-            'title': safe_encode(item.get('title'), 'iso-8859-1'),
+            'title': safe_encode(item.get('title')),
             'description': '',
         }
         if data not in results:
