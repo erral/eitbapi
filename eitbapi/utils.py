@@ -44,7 +44,10 @@ def safe_unicode(text, charset='utf-8'):
 
 
 def xml_to_dict(data):
-    root = ET.fromstring(data)
+    try:
+        root = ET.fromstring(data)
+    except:
+        root = []
     d = {}
     for item in root:
         dd = {}
