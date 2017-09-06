@@ -21,26 +21,35 @@ EITB_RADIO_ITEMS_URL = "http://www.eitb.tv/es/radio/"
 EITB_BASE_URL = "http://www.eitb.tv/"
 
 EITB_TV_PROGRAM_LIST_XML_URL = 'http://www.eitb.tv/eu/menu/getMenu/tv/'
-EITB_RADIO_PROGRAM_LIST_XML_URL = 'http://www.eitb.tv/eu/menu/getMenu/radio/'
+EITB_RADIO_PROGRAM_LIST_XML_URL = 'http://www.eitb.tv/es/menu/getMenu/radio/'
 
 
-def safe_unicode(text, charset='utf-8'):
+def safe_unicode(value, encoding='utf-8'):
     if PYTHON3:
-        if isinstance(text, bytes):
-            return text
+        if isinstance(value, bytes):
+            return value
+        elif isinstance(value, str):
+            try:
+                value = bytes(value, encoding)
+            except (UnicodeDecodeError):
+                value = value.decode('utf-8', 'replace')
+        return value
     else:
-        if isinstance(text, unicode):
-            return text
-    if isinstance(text, str):
-        return unicode(text, charset)
+        if isinstance(value, unicode):
+            return value
+        elif isinstance(value, basestring):
+            try:
+                value = unicode(value, encoding)
+            except (UnicodeDecodeError):
+                value = value.decode('utf-8', 'replace')
+        return value
+
+
+def safe_encode(value, charset='utf-8'):
+    if PYTHON3:
+        return safe_unicode(value, charset).decode(charset)
     else:
-        try:
-            if PYTHON3:
-                return bytes(text)
-            else:
-                return unicode(text)
-        except:
-            return ''
+        return safe_unicode(value, charset).encode(charset)
 
 
 def xml_to_dict(data):
