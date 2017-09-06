@@ -2,27 +2,21 @@
 from __future__ import unicode_literals
 from bs4 import BeautifulSoup
 from pyramid.view import view_config
-from eitbapi.utils import EITB_EPISODE_LIST_REGEX
-from eitbapi.utils import EITB_FRONT_PAGE_URL
 from eitbapi.utils import EITB_PLAYLIST_BASE_URL
 from eitbapi.utils import EITB_VIDEO_BASE_URL
 from eitbapi.utils import EITB_VIDEO_URL
-from eitbapi.utils import EITB_RADIO_ITEMS_URL
 from eitbapi.utils import EITB_BASE_URL
-from eitbapi.utils import safe_unicode
+from eitbapi.utils import safe_encode
 from eitbapi.utils import get_tv_program_data
 from eitbapi.utils import get_radio_program_data
 
-import base64
 import datetime
 import json
 import os
 import pytz
-import re
 import redis
 import requests
 import youtube_dl
-import xml
 
 
 if os.environ.get('REDIS_URL'):
@@ -56,7 +50,7 @@ def programs(request):
         data = {
             '@id': request.route_url('playlist', playlist_id=item.get('id')),
             '@type': 'Playlist',
-            'title': safe_unicode(item.get('title'), 'iso-8859-1'),
+            'title': safe_encode(item.get('title')),
             'description': '',
         }
         if data not in results:
@@ -97,7 +91,7 @@ def radio(request):
         data = {
             '@id': request.route_url('radioplaylist', playlist_id=item.get('id')),
             '@type': 'Radio Playlist',
-            'title': safe_unicode(item.get('title'), 'iso-8859-1'),
+            'title': safe_encode(item.get('title')),
             'description': '',
         }
         if data not in results:
