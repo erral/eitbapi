@@ -98,20 +98,30 @@ def get_radio_program_data():
     results = []
     menudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
-    menu_hash = menudict.get('programas_az', {}).get('submenu', {}).get('hash', '')
+    menu_hash = menudict.get('programas_az', {}).get('submenu', {}).get('hash', None)
 
+    results = get_submenu_data(menu_hash, first=True)
+
+    return results
+
+
+def get_submenu_data(menu_hash, pretitle='', first=False):
+    #import pdb; pdb.set_trace()
     submenudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL + '/' + menu_hash)
     submenudict = xml_to_dict(submenudata.content)
-
+    results = []
     for item in submenudict.values():
-        subhash = item.get('submenu', {}).get('hash')
-        subsubmenudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL + '/' + subhash)
-        subsubmenudict = xml_to_dict(subsubmenudata.content)
-        for program in subsubmenudict.values():
-            data = {}
-            data['title'] = program.get('title', {}).get('text', '')
-            data['id'] = program.get('id', {}).get('text', '')
-            if data['id']:
-                results.append(data)
+        subhash = item.get('submenu', {}).get('hash', None)
+        if subhash:
+            if first:
+                results += get_submenu_data(subhash)
+            else:
+                results += get_submenu_data(subhash, pretitle=item.get('title').get('text'))
+
+        data = {}
+        data['title'] = pretitle + ' ' + item.get('title', {}).get('text', '')
+        data['id'] = item.get('id', {}).get('text', '')
+        if data['id']:
+            results.append(data)
 
     return results
