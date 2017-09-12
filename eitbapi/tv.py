@@ -4,6 +4,8 @@ from eitbapi.utils import create_internal_video_url
 from eitbapi.utils import EITB_PLAYLIST_BASE_URL
 from eitbapi.utils import EITB_VIDEO_BASE_URL
 from eitbapi.utils import get_tv_program_data
+from eitbapi.utils import get_tv_program_types
+from eitbapi.utils import get_tv_program_data_per_type
 from eitbapi.utils import safe_encode
 from pyramid.view import view_config
 
@@ -22,13 +24,7 @@ else:
     r = {}
 
 
-@view_config(route_name='programs', renderer='prettyjson')
-def programs(request):
-    """get all information about all the programs.
-    How: scrap the website and look for the javascript links.
-    """
-    menudata = get_tv_program_data()
-
+def prepare_program_list(request, menudata):
     result = {
         '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
         '@id': request.route_url('programs'),
@@ -51,6 +47,46 @@ def programs(request):
     result['member'] = sorted(results, key=lambda x: x.get('title', u'').lower())
 
     return result
+
+
+@view_config(route_name='programs', renderer='prettyjson')
+def programs(request):
+    """get all information about all the programs.
+    How: scrap the website and look for the javascript links.
+    """
+    menudata = get_tv_program_data()
+    return prepare_program_list(request, menudata)
+
+
+@view_config(route_name='program-type-list', renderer='prettyjson')
+def program_type_list(request):
+    result = {
+        '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
+        '@id': request.route_url('program-type-list'),
+        '@type': 'TypeList',
+        'parent': request.route_url('home'),
+        'member': []
+    }
+    member = []
+    categorydict = get_tv_program_types(request)
+    for categoryname, categoryvalues in categorydict.items():
+        item = {
+            '@id': request.route_url('playlist-per-type', playlist_id=categoryvalues.get('submenu', {}).get('hash', '')),
+            '@type': 'Type-Playlist',
+            'parent': request.route_url('program-type-list'),
+            'title': categoryname
+        }
+        member.append(item)
+
+    result['member'] = sorted(member, key=lambda x: x.get('title'))
+    return result
+
+
+@view_config(route_name='playlist-per-type', renderer='prettyjson')
+def programs_per_type(request):
+    playlist_id = request.matchdict['playlist_id']
+    menudata = get_tv_program_data_per_type(playlist_id)
+    return prepare_program_list(request, menudata)
 
 
 @view_config(route_name='playlist', renderer='prettyjson')

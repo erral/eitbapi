@@ -73,27 +73,29 @@ def xml_to_dict(data):
     return d
 
 
+def build_program_list_by_hash(menu_hash):
+    results = get_tv_submenu_data(menu_hash, first=True)
+    return results
+
+
 def get_tv_program_data():
-    results = []
     menudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
     menu_hash = menudict.get('programas_az', {}).get('submenu', {}).get('hash', '')
+    return build_program_list_by_hash(menu_hash)
 
-    submenudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL + '/' + menu_hash)
-    submenudict = xml_to_dict(submenudata.content)
 
-    for item in submenudict.values():
-        subhash = item.get('submenu', {}).get('hash')
-        subsubmenudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL + '/' + subhash)
-        subsubmenudict = xml_to_dict(subsubmenudata.content)
-        for program in subsubmenudict.values():
-            data = {}
-            data['title'] = program.get('title', {}).get('text', '').strip()
-            data['id'] = program.get('id', {}).get('text', '')
-            if data['id']:
-                results.append(data)
+def get_tv_program_data_per_type(menu_hash):
+    return build_program_list_by_hash(menu_hash)
 
-    return results
+
+def get_tv_program_types(request):
+    menudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL)
+    menudict = xml_to_dict(menudata.content)
+    menu_hash = menudict.get('por_categorias', {}).get('submenu', {}).get('hash', '')
+    categorydata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL + '/' + menu_hash)
+    categorydict = xml_to_dict(categorydata.content)
+    return categorydict
 
 
 def get_radio_program_data():
@@ -102,23 +104,22 @@ def get_radio_program_data():
     menudict = xml_to_dict(menudata.content)
     menu_hash = menudict.get('programas_az', {}).get('submenu', {}).get('hash', None)
 
-    results = get_submenu_data(menu_hash, first=True)
+    results = get_radio_submenu_data(menu_hash, first=True)
 
     return results
 
 
-def get_submenu_data(menu_hash, pretitle='', first=False):
-    #import pdb; pdb.set_trace()
-    submenudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL + '/' + menu_hash)
+def get_tv_submenu_data(menu_hash, pretitle='', first=False):
+    submenudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL + '/' + menu_hash)
     submenudict = xml_to_dict(submenudata.content)
     results = []
     for item in submenudict.values():
         subhash = item.get('submenu', {}).get('hash', None)
         if subhash:
             if first:
-                results += get_submenu_data(subhash)
+                results += get_tv_submenu_data(subhash)
             else:
-                results += get_submenu_data(subhash, pretitle=item.get('title').get('text'))
+                results += get_tv_submenu_data(subhash, pretitle=item.get('title').get('text'))
 
         data = {}
         data['title'] = (pretitle + ' ' + item.get('title', {}).get('text', '')).strip()
@@ -128,6 +129,26 @@ def get_submenu_data(menu_hash, pretitle='', first=False):
 
     return results
 
+
+def get_radio_submenu_data(menu_hash, pretitle='', first=False):
+    submenudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL + '/' + menu_hash)
+    submenudict = xml_to_dict(submenudata.content)
+    results = []
+    for item in submenudict.values():
+        subhash = item.get('submenu', {}).get('hash', None)
+        if subhash:
+            if first:
+                results += get_radio_submenu_data(subhash)
+            else:
+                results += get_radio_submenu_data(subhash, pretitle=item.get('title').get('text'))
+
+        data = {}
+        data['title'] = (pretitle + ' ' + item.get('title', {}).get('text', '')).strip()
+        data['id'] = item.get('id', {}).get('text', '')
+        if data['id']:
+            results.append(data)
+
+    return results
 
 def create_internal_video_url(playlist_title, playlist_id, video_title, video_id, request=None):
     """create an internal url to identify an episode inside this API."""
