@@ -1,8 +1,10 @@
+# -*- coding: utf8 -*-
 from __future__ import unicode_literals
 
 import requests
 import sys
 import xml.etree.ElementTree as ET
+import youtube_dl
 
 if sys.version_info >= (3, 0, 0):
     # for Python 3
@@ -125,3 +127,62 @@ def get_submenu_data(menu_hash, pretitle='', first=False):
             results.append(data)
 
     return results
+
+
+def create_internal_video_url(playlist_title, playlist_id, video_title, video_id, request=None):
+    """create an internal url to identify an episode inside this API."""
+    playlist_title = clean_title(playlist_title)
+    video_title = clean_title(playlist_title)
+
+    internal_url = '{}/{}/{}/{}'.format(playlist_title, playlist_id, video_id, video_title)
+    return request.route_url('episode', episode_url=internal_url)
+
+
+def create_video_url(playlist_title, playlist_id, video_title, video_id):
+    """create the URL of a given episode to be used with youtube-dl."""
+    playlist_title = clean_title(playlist_title)
+    video_title = clean_title(playlist_title)
+
+    return EITB_VIDEO_URL.format(playlist_title, playlist_id, video_id, video_title)
+
+
+def get_video_urls(playlist_title, playlist_id, video_title, video_id):
+    """helper method to get the information from youtube-dl"""
+    ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
+    url = create_video_url(playlist_title, playlist_id, video_title, video_id)
+    result = ydl.extract_info(url, download=False)
+    return result
+
+
+def clean_title(title):
+    """slugify the titles using the method that EITB uses in
+       the website:
+       - url: http://www.eitb.tv/resources/js/comun/comun.js
+       - method: string2url
+    """
+    translation_map = {
+        'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A', 'Å': 'A', 'Æ': 'E',
+        'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E',
+        'Ì': 'I', 'Í': 'I', 'Î': 'I', 'Ï': 'I',
+        'Ò': 'O', 'Ó': 'O', 'Ô': 'O', 'Ö': 'O',
+        'Ù': 'U', 'Ú': 'U', 'Û': 'U', 'Ü': 'U',
+        'Ñ': 'N', '?': '', '¿': '', '!': '',
+        '¡': '', ':': '', '_': '-', 'º': '',
+        'ª': 'a', ',': '', '.': '', '(': '',
+        ')': '', '@': '', ' ': '-', '&': ''
+    }
+
+    val = title.upper()
+    for k, v in translation_map.items():
+        val = val.replace(k, v)
+    return val.lower()
+
+
+def extract_radio_info_from_url(url):
+    """ /eu/irratia/gaztea/akabo-bakea/3601966/" """
+    _, lang, _, radio, lowertitle, id, _ = url.split('/')
+    return dict(
+        id=url[1:],
+        title=lowertitle.replace('-', ' ').capitalize(),
+        radio=radio.replace('-', ' ').capitalize(),
+    )
