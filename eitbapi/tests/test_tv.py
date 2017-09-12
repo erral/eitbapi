@@ -13,12 +13,27 @@ class TVTests(unittest.TestCase):
         self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
 
     def test_program_playlist(self):
-        res = self.testapp.get('/playlist/4105019553001', status=200)
-        self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
+        res = self.testapp.get('/playlist', status=200)
+        members = json.loads(res.text).get('member', [])
+        for member in members[:2]:
+            # Workaround to remove localhost prefix from id url
+            url = member.get('@id').replace('http://localhost', '')
+            result = self.testapp.get(url, status=200)
+            self.assertTrue(result.headers.get('Content-type').startswith('application/json'))
 
     def test_program_playlist_episode(self):
-        res = self.testapp.get('/episode/heltzean/927/23221/heltzean', status=200)
-        self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
+        res = self.testapp.get('/playlist', status=200)
+        members = json.loads(res.text).get('member', [])
+        for member in members[:1]:
+            # Workaround to remove localhost prefix from id url
+            url = member.get('@id').replace('http://localhost', '')
+            result = self.testapp.get(url, status=200)
+            submembers = json.loads(result.text).get('member', [])
+            for submember in submembers[:2]:
+                # Workaround to remove localhost prefix from id url
+                suburl = submember.get('@id').replace('http://localhost', '')
+                subresult = self.testapp.get(suburl, status=200)
+                self.assertTrue(subresult.headers.get('Content-type').startswith('application/json'))
 
     def test_program_type_list(self):
         res = self.testapp.get('/program-type-list', status=200)
