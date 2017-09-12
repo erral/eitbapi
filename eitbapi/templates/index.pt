@@ -12,9 +12,8 @@
 
     <title>EITB Nahieran API</title>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
 
-    <link rel="stylesheet" href="https://getbootstrap.com/examples/cover/cover.css" />
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -25,36 +24,22 @@
   </head>
 
   <body>
-
-    <div class="site-wrapper">
-
-      <div class="site-wrapper-inner">
-
-        <div class="cover-container">
-
-          <div class="masthead clearfix">
-            <div class="inner">
-              <h3 class="masthead-brand">EITB Nahieran APIa</h3>
-            </div>
-          </div>
-
-          <div class="inner cover">
-            <h1 class="cover-heading">EITB Nahieran APIa</h1>
-            <p class="lead">
-                  Webgune honek <a href="http://www.eitb.tv">EITB</a> Nahieran zerbitzuaren APIa eskaintzen du.
-            </p>
-            <p class="lead">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12">
+                <div class="jumbotron">
+                  <h1>EITB Nahieran APIa</h1>
+                  <p class="lead">
+                    Webgune honek <a href="http://www.eitb.tv">EITB</a> Nahieran zerbitzuaren APIa eskaintzen du.
+                  </p>
+                  <p class="lead">
                     <a class="btn btn-primary btn-lg" href="https://erral.github.io/eitbapi">Ikusi aurkezpena</a>
-            </p>
-            <p class="lead">
-              <a class="btn btn-default btn-lg" href="${request.route_url('programs')}">
-                Telebista programa zerrenda ikusi
-              </a>
-              <br />
-              <a class="btn btn-default btn-lg" href="${request.route_url('radio')}">
-                Irrati programa zerrenda ikusi
-              </a>
-
+                  </p>
+                </div>
+              </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
               <ul>
                   <li>
                       Chrome/Chromium-en ondo ikusteko <a href="https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa?utm_source=chrome-app-launcher-info-dialog">instalatu JSON Formatter</a>
@@ -63,28 +48,36 @@
                       Firefox-en ondo ikusteko <a href="https://addons.mozilla.org/en-US/firefox/addon/jsonview/">instalatu JSONView</a>
                   </li>
               </ul>
-            </p>
-          </div>
-
-          <div class="mastfoot">
-            <div class="inner">
-              <p>Cover template for <a href="http://getbootstrap.com">Bootstrap</a>, by <a href="https://twitter.com/mdo">@mdo</a>.</p>
             </div>
           </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <h2>Telebista APIa</h2>
+              <div class="btn-group-vertical" role="group">
+                <a class="btn btn-default btn-lg" href="${request.route_url('programs')}">
+                  Telebista programa zerrenda ikusi
+                </a>
+                <a class="btn btn-default btn-lg" href="${request.route_url('program-type-list')}">
+                  Telebista programa-moten zerrenda ikusi
+                </a>
+                <a class="btn btn-default btn-lg" href="${request.route_url('program-type-news')}">
+                  Albistegi zerrenda ikusi
+                </a>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <h2>Irrati APIa</h2>
+              <div class="btn-group-vertical" role="group">
+                <a class="btn btn-default btn-lg" href="${request.route_url('radio')}">
+                  Irratiko programa zerrenda ikusi
+                </a>
+              </div>
+            </div>
 
-        </div>
-
+          </div>
       </div>
 
-    </div>
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
   </body>
 </html>
