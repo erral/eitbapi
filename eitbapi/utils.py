@@ -86,7 +86,7 @@ def get_tv_program_data():
         subsubmenudict = xml_to_dict(subsubmenudata.content)
         for program in subsubmenudict.values():
             data = {}
-            data['title'] = program.get('title', {}).get('text', '')
+            data['title'] = program.get('title', {}).get('text', '').strip()
             data['id'] = program.get('id', {}).get('text', '')
             if data['id']:
                 results.append(data)
@@ -119,7 +119,7 @@ def get_submenu_data(menu_hash, pretitle='', first=False):
                 results += get_submenu_data(subhash, pretitle=item.get('title').get('text'))
 
         data = {}
-        data['title'] = pretitle + ' ' + item.get('title', {}).get('text', '')
+        data['title'] = (pretitle + ' ' + item.get('title', {}).get('text', '')).strip()
         data['id'] = item.get('id', {}).get('text', '')
         if data['id']:
             results.append(data)
