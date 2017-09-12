@@ -39,6 +39,10 @@ class TVTests(unittest.TestCase):
         res = self.testapp.get('/program-type-list', status=200)
         self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
 
+    def test_program_type_news(self):
+        res = self.testapp.get('/program-type-news', status=200)
+        self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
+
     def test_program_list_per_type(self):
         res = self.testapp.get('/program-type-list', status=200)
         members = json.loads(res.text).get('member', [])

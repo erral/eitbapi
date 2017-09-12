@@ -3,9 +3,10 @@ from __future__ import unicode_literals
 from eitbapi.utils import create_internal_video_url
 from eitbapi.utils import EITB_PLAYLIST_BASE_URL
 from eitbapi.utils import EITB_VIDEO_BASE_URL
+from eitbapi.utils import get_tv_news_programs
 from eitbapi.utils import get_tv_program_data
-from eitbapi.utils import get_tv_program_types
 from eitbapi.utils import get_tv_program_data_per_type
+from eitbapi.utils import get_tv_program_types
 from eitbapi.utils import safe_encode
 from pyramid.view import view_config
 
@@ -69,6 +70,30 @@ def program_type_list(request):
     }
     member = []
     categorydict = get_tv_program_types(request)
+    for categoryname, categoryvalues in categorydict.items():
+        item = {
+            '@id': request.route_url('playlist-per-type', playlist_id=categoryvalues.get('submenu', {}).get('hash', '')),
+            '@type': 'Type-Playlist',
+            'parent': request.route_url('program-type-list'),
+            'title': categoryname
+        }
+        member.append(item)
+
+    result['member'] = sorted(member, key=lambda x: x.get('title'))
+    return result
+
+
+@view_config(route_name='program-type-news', renderer='prettyjson')
+def program_type_news(request):
+    result = {
+        '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
+        '@id': request.route_url('program-type-list'),
+        '@type': 'TypeList',
+        'parent': request.route_url('home'),
+        'member': []
+    }
+    member = []
+    categorydict = get_tv_news_programs(request)
     for categoryname, categoryvalues in categorydict.items():
         item = {
             '@id': request.route_url('playlist-per-type', playlist_id=categoryvalues.get('submenu', {}).get('hash', '')),

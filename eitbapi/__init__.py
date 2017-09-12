@@ -11,6 +11,7 @@ def main(global_config, **settings):
     config.add_route('home', '/')
     config.add_route('programs', '/playlist')
     config.add_route('program-type-list', '/program-type-list')
+    config.add_route('program-type-news', '/program-type-news')
     config.add_route('playlist', '/playlist/{playlist_id}')
     config.add_route('playlist-per-type', '/type-playlist/{playlist_id}')
     config.add_route('radio', '/radio')

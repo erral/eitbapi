@@ -98,6 +98,15 @@ def get_tv_program_types(request):
     return categorydict
 
 
+def get_tv_news_programs(request):
+    menudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL)
+    menudict = xml_to_dict(menudata.content)
+    menu_hash = menudict.get('informativos', {}).get('submenu', {}).get('hash', '')
+    categorydata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL + '/' + menu_hash)
+    categorydict = xml_to_dict(categorydata.content)
+    return categorydict
+
+
 def get_radio_program_data():
     results = []
     menudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL)

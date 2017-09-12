@@ -60,6 +60,9 @@
                 <a class="btn btn-default btn-lg" href="${request.route_url('program-type-list')}">
                   Telebista programa-moten zerrenda ikusi
                 </a>
+                <a class="btn btn-default btn-lg" href="${request.route_url('program-type-news')}">
+                  Albistegi zerrenda ikusi
+                </a>
               </div>
             </div>
             <div class="col-sm-6">
