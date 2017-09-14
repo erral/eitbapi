@@ -159,6 +159,7 @@ def get_radio_submenu_data(menu_hash, pretitle='', first=False):
 
     return results
 
+
 def create_internal_video_url(playlist_title, playlist_id, video_title, video_id, request=None):
     """create an internal url to identify an episode inside this API."""
     playlist_title = clean_title(playlist_title)
