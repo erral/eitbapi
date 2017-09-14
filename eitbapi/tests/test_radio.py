@@ -39,7 +39,7 @@ class RadioTests(unittest.TestCase):
         self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
 
     def test_radio_station_program_list(self):
-        res = self.testapp.get('/radio-program-type-list', status=200)
+        res = self.testapp.get('/radio-stations', status=200)
         members = json.loads(res.text).get('member', [])
         for member in members:
             # Workaround to remove localhost prefix from id url
