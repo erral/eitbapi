@@ -1,5 +1,5 @@
+import json
 import unittest
-
 
 class RadioTests(unittest.TestCase):
     def setUp(self):
@@ -13,5 +13,23 @@ class RadioTests(unittest.TestCase):
         self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
 
     def test_radio_playlist(self):
-        res = self.testapp.get('/rplaylist/es/radio/radio-vitoria/5-minutos-mas/4346748/', status=200)
+        res = self.testapp.get('/radio', status=200)
+        members = json.loads(res.text).get('member', [])
+        for member in members[:2]:
+            # Workaround to remove localhost prefix from id url
+            url = member.get('@id').replace('http://localhost', '')
+            result = self.testapp.get(url, status=200)
+            self.assertTrue(result.headers.get('Content-type').startswith('application/json'))
+
+    def test_radio_program_types_list(self):
+        res = self.testapp.get('/radio-program-type-list', status=200)
         self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
+
+    def test_radio_program_type_playlist(self):
+        res = self.testapp.get('/radio-program-type-list', status=200)
+        members = json.loads(res.text).get('member', [])
+        for member in members[:2]:
+            # Workaround to remove localhost prefix from id url
+            url = member.get('@id').replace('http://localhost', '')
+            result = self.testapp.get(url, status=200)
+            self.assertTrue(result.headers.get('Content-type').startswith('application/json'))
