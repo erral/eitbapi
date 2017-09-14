@@ -11,18 +11,9 @@ from eitbapi.utils import safe_encode
 from pyramid.view import view_config
 
 import datetime
-import json
-import os
 import pytz
-import redis
 import requests
 import youtube_dl
-
-
-if os.environ.get('REDIS_URL'):
-    r = redis.from_url(os.environ.get("REDIS_URL"))
-else:
-    r = {}
 
 
 def prepare_program_list(request, menudata):
@@ -121,86 +112,75 @@ def playlist(request):
     """
     playlist_id = request.matchdict['playlist_id']
 
-    # try:
-    #     result = r.get(playlist_id)
-    # except:
-    #     result = None
-    result = None
+    result = {
+        '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
+        '@id': request.route_url('playlist', playlist_id=playlist_id),
+        '@type': 'Playlist',
+        'parent': request.route_url('programs'),
+    }
 
-    if result is not None:
-        return json.loads(result)
-    else:
-        result = {
-            '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
-            '@id': request.route_url('playlist', playlist_id=playlist_id),
-            '@type': 'Playlist',
-            'parent': request.route_url('programs'),
-        }
-
-        playlist_url = EITB_PLAYLIST_BASE_URL.format(playlist_id)
-        try:
-            data = requests.get(playlist_url)
-            playlist_data = data.json()
-        except ValueError:
-            return result
-
-        web_medias = playlist_data.get('web_media')
-        del playlist_data['web_media']
-
-        member = []
-        for web_media in web_medias:
-            language = web_media.get('IDIOMA', '')
-            pubdatestr = web_media.get('PUB_DATE', '')
-            broadcastdatestr = web_media.get('BROADCST_DATE', '')
-            dateformat = '%Y-%m-%d %H:%M:%S'
-
-            tz = pytz.timezone('Europe/Madrid')
-            try:
-                pubdate = datetime.datetime.strptime(pubdatestr, dateformat)
-                pubdate = tz.localize(pubdate)
-                pubdateiso = pubdate.isoformat()
-            except:
-                pubdateiso = pubdatestr
-
-            try:
-                broadcastdate = datetime.datetime.strptime(broadcastdatestr, dateformat)
-                broadcastdate = tz.localize(broadcastdate)
-                broadcastdateiso = broadcastdate.isoformat()
-            except:
-                broadcastdateiso = broadcastdatestr
-            item = {
-                '@id': create_internal_video_url(
-                    playlist_data.get('name_playlist'),
-                    playlist_data.get('id_web_playlist'),
-                    web_media.get('NAME_ES'),
-                    web_media.get('ID_WEB_MEDIA'),
-                    request=request,
-                ),
-                '@type': 'Episode',
-                'title': web_media.get('NAME_{}'.format(language)),
-                'title_eu': web_media.get('NAME_EU'),
-                'title_es': web_media.get('NAME_ES'),
-                'description': web_media.get('SHORT_DESC_{}'.format(language)),
-                'description_eu': web_media.get('SHORT_DESC_EU', ''),
-                'description_es': web_media.get('SHORT_DESC_ES', ''),
-                'publication_date': pubdateiso,
-                'broadcast_date': broadcastdateiso,
-                'episode_image': web_media.get('STILL_URL', ''),
-                'episode_image_thumbnail': web_media.get('THUMBNAIL_URL', ''),
-                'language': language.lower(),
-            }
-            if item not in member:
-                member.append(item)
-        playlist_data['member'] = sorted(member, key=lambda x: x.get('broadcast_date'), reverse=True)
-
-        del playlist_data['id']
-
-        result.update(playlist_data)
-        try:
-            r.set(playlist_id, json.dumps(result), ex=3600)
-        except:
-            pass
+    playlist_url = EITB_PLAYLIST_BASE_URL.format(playlist_id)
+    try:
+        data = requests.get(playlist_url)
+        playlist_data = data.json()
+    except ValueError:
         return result
+
+    web_medias = playlist_data.get('web_media')
+    del playlist_data['web_media']
+
+    member = []
+    for web_media in web_medias:
+        language = web_media.get('IDIOMA', '')
+        pubdatestr = web_media.get('PUB_DATE', '')
+        broadcastdatestr = web_media.get('BROADCST_DATE', '')
+        dateformat = '%Y-%m-%d %H:%M:%S'
+
+        tz = pytz.timezone('Europe/Madrid')
+        try:
+            pubdate = datetime.datetime.strptime(pubdatestr, dateformat)
+            pubdate = tz.localize(pubdate)
+            pubdateiso = pubdate.isoformat()
+        except:
+            pubdateiso = pubdatestr
+
+        try:
+            broadcastdate = datetime.datetime.strptime(broadcastdatestr, dateformat)
+            broadcastdate = tz.localize(broadcastdate)
+            broadcastdateiso = broadcastdate.isoformat()
+        except:
+            broadcastdateiso = broadcastdatestr
+
+        item = {
+            '@id': create_internal_video_url(
+                playlist_data.get('name_playlist'),
+                playlist_data.get('id_web_playlist'),
+                web_media.get('NAME_ES'),
+                web_media.get('ID_WEB_MEDIA'),
+                request=request,
+            ),
+            '@type': 'Episode',
+            'title': web_media.get('NAME_{}'.format(language)),
+            'title_eu': web_media.get('NAME_EU'),
+            'title_es': web_media.get('NAME_ES'),
+            'description': web_media.get('SHORT_DESC_{}'.format(language)),
+            'description_eu': web_media.get('SHORT_DESC_EU', ''),
+            'description_es': web_media.get('SHORT_DESC_ES', ''),
+            'publication_date': pubdateiso,
+            'broadcast_date': broadcastdateiso,
+            'episode_image': web_media.get('STILL_URL', ''),
+            'episode_image_thumbnail': web_media.get('THUMBNAIL_URL', ''),
+            'language': language.lower(),
+        }
+        if item not in member:
+            member.append(item)
+
+    playlist_data['member'] = sorted(member, key=lambda x: x.get('broadcast_date'), reverse=True)
+
+    del playlist_data['id']
+
+    result.update(playlist_data)
+    return result
 
 
 @view_config(route_name='episode', renderer='prettyjson')
@@ -210,39 +190,24 @@ def episode(request):
     """
     episode_url = request.matchdict['episode_url']
 
-    # try:
-    #     result = r.get(episode_url)
-    # except:
-    #     result = None
-    result = None
+    url = EITB_VIDEO_BASE_URL + episode_url
+    try:
+        playlist_title, playlist_id, video_title, video_id = episode_url.split('/')
+    except ValueError:
+        return {}
 
-    if result is not None:
-        return json.loads(result)
-    else:
-        url = EITB_VIDEO_BASE_URL + episode_url
-        try:
-            playlist_title, playlist_id, video_title, video_id = episode_url.split('/')
-        except ValueError:
-            return {}
+    result = {
+        '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
+        '@id': request.route_url('episode', episode_url=episode_url),
+        '@type': 'Episode',
+        'parent': request.route_url('playlist', playlist_id=playlist_id),
+    }
 
-        result = {
-            '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
-            '@id': request.route_url('episode', episode_url=episode_url),
-            '@type': 'Episode',
-            'parent': request.route_url('playlist', playlist_id=playlist_id),
-        }
-
-        try:
-            ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
-            video_data = ydl.extract_info(url, download=False)
-        except youtube_dl.DownloadError:
-            return result
-
-        result.update(video_data)
-
-        try:
-            r.set(episode_url, json.dumps(result), ex=3600)
-        except:
-            pass
-
+    try:
+        ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
+        video_data = ydl.extract_info(url, download=False)
+    except youtube_dl.DownloadError:
         return result
+
+    result.update(video_data)
+    return result

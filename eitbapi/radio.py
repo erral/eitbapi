@@ -6,16 +6,7 @@ from eitbapi.utils import get_radio_program_data
 from eitbapi.utils import safe_encode
 from pyramid.view import view_config
 
-import json
-import os
-import redis
 import requests
-
-
-if os.environ.get('REDIS_URL'):
-    r = redis.from_url(os.environ.get("REDIS_URL"))
-else:
-    r = {}
 
 
 @view_config(route_name='radio', renderer='prettyjson')
@@ -55,42 +46,32 @@ def radioplaylist(request):
     """
     playlist_id = request.matchdict['playlist_id']
 
-    # try:
-    #     result = r.get(playlist_id)
-    # except:
-    #     result = None
-    result = None
-
-    if result is not None:
-        return json.loads(result)
-
-    else:
-        result = {
+    result = {
+        '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
+        '@id': request.route_url('radioplaylist', playlist_id=playlist_id),
+        '@type': 'Radio Playlist',
+        'parent': request.route_url('radio'),
+    }
+    results = []
+    data = requests.get(EITB_BASE_URL + playlist_id)
+    soup = BeautifulSoup(data.text, "html.parser")
+    for li in soup.find_all('li', class_='audio_uno'):
+        title_p, date_p, download_p = li.find_all('p')
+        title = title_p.find('a').get('original-title')
+        date, duration = date_p.text.split()
+        url = download_p.find('a').get('href')
+        duration = duration.replace('(', '').replace(')', '')
+        item = {
+            '@id': '',
+            '@type': 'Radio Program',
             '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
-            '@id': request.route_url('radioplaylist', playlist_id=playlist_id),
-            '@type': 'Radio Playlist',
-            'parent': request.route_url('radio'),
+            'title': title,
+            'date': date,
+            'duration': duration,
+            'url': url,
         }
-        results = []
-        data = requests.get(EITB_BASE_URL + playlist_id)
-        soup = BeautifulSoup(data.text, "html.parser")
-        for li in soup.find_all('li', class_='audio_uno'):
-            title_p, date_p, download_p = li.find_all('p')
-            title = title_p.find('a').get('original-title')
-            date, duration = date_p.text.split()
-            url = download_p.find('a').get('href')
-            duration = duration.replace('(', '').replace(')', '')
-            item = {
-                '@id': '',
-                '@type': 'Radio Program',
-                '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
-                'title': title,
-                'date': date,
-                'duration': duration,
-                'url': url,
-            }
-            if item not in results:
-                results.append(item)
+        if item not in results:
+            results.append(item)
 
-        result['member'] = sorted(results, key=lambda x: x.get('date', ''), reverse=True)
-        return result
+    result['member'] = sorted(results, key=lambda x: x.get('date', ''), reverse=True)
+    return result
