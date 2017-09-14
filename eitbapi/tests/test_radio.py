@@ -33,3 +33,16 @@ class RadioTests(unittest.TestCase):
             url = member.get('@id').replace('http://localhost', '')
             result = self.testapp.get(url, status=200)
             self.assertTrue(result.headers.get('Content-type').startswith('application/json'))
+
+    def test_radio_station_list(self):
+        res = self.testapp.get('/radio-stations', status=200)
+        self.assertTrue(res.headers.get('Content-type').startswith('application/json'))
+
+    def test_radio_station_program_list(self):
+        res = self.testapp.get('/radio-program-type-list', status=200)
+        members = json.loads(res.text).get('member', [])
+        for member in members:
+            # Workaround to remove localhost prefix from id url
+            url = member.get('@id').replace('http://localhost', '')
+            result = self.testapp.get(url, status=200)
+            self.assertTrue(result.headers.get('Content-type').startswith('application/json'))
