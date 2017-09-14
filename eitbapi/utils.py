@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from __future__ import unicode_literals
+from bs4 import BeautifulSoup
 
 import requests
 import sys
@@ -73,8 +74,11 @@ def xml_to_dict(data):
     return d
 
 
-def build_program_list_by_hash(menu_hash):
-    results = get_tv_submenu_data(menu_hash, first=True)
+def build_program_list_by_hash(menu_hash, mode='tv'):
+    if mode == 'tv':
+        results = get_tv_submenu_data(menu_hash, first=True)
+    elif mode == 'radio':
+        results = get_radio_submenu_data(menu_hash)
     return results
 
 
@@ -82,11 +86,11 @@ def get_tv_program_data():
     menudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
     menu_hash = menudict.get('programas_az', {}).get('submenu', {}).get('hash', '')
-    return build_program_list_by_hash(menu_hash)
+    return build_program_list_by_hash(menu_hash, mode='tv')
 
 
 def get_tv_program_data_per_type(menu_hash):
-    return build_program_list_by_hash(menu_hash)
+    return build_program_list_by_hash(menu_hash, mode='tv')
 
 
 def get_tv_program_types(request):
@@ -112,10 +116,17 @@ def get_radio_program_data():
     menudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
     menu_hash = menudict.get('programas_az', {}).get('submenu', {}).get('hash', None)
-
-    results = get_radio_submenu_data(menu_hash, first=True)
-
+    results = get_radio_submenu_data(menu_hash)
     return results
+
+
+def get_radio_program_types():
+    menudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL)
+    menudict = xml_to_dict(menudata.content)
+    menu_hash = menudict.get('por_categorias', {}).get('submenu', {}).get('hash', '')
+    categorydata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL + '/' + menu_hash)
+    categorydict = xml_to_dict(categorydata.content)
+    return categorydict
 
 
 def get_tv_submenu_data(menu_hash, pretitle='', first=False):
@@ -139,17 +150,14 @@ def get_tv_submenu_data(menu_hash, pretitle='', first=False):
     return results
 
 
-def get_radio_submenu_data(menu_hash, pretitle='', first=False):
+def get_radio_submenu_data(menu_hash, pretitle=''):
     submenudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL + '/' + menu_hash)
     submenudict = xml_to_dict(submenudata.content)
     results = []
     for item in submenudict.values():
         subhash = item.get('submenu', {}).get('hash', None)
         if subhash:
-            if first:
-                results += get_radio_submenu_data(subhash)
-            else:
-                results += get_radio_submenu_data(subhash, pretitle=item.get('title').get('text'))
+            results += get_radio_submenu_data(subhash, pretitle=item.get('title').get('text'))
 
         data = {}
         data['title'] = (pretitle + ' ' + item.get('title', {}).get('text', '')).strip()
@@ -217,3 +225,27 @@ def extract_radio_info_from_url(url):
         title=lowertitle.replace('-', ' ').capitalize(),
         radio=radio.replace('-', ' ').capitalize(),
     )
+
+
+def get_radio_programs(playlist_id):
+    results = []
+    data = requests.get(EITB_BASE_URL + playlist_id)
+    soup = BeautifulSoup(data.text, "html.parser")
+    for li in soup.find_all('li', class_='audio_uno'):
+        title_p, date_p, download_p = li.find_all('p')
+        title = title_p.find('a').get('original-title')
+        date, duration = date_p.text.split()
+        url = download_p.find('a').get('href')
+        duration = duration.replace('(', '').replace(')', '')
+        item = dict(
+            title=title,
+            date=date,
+            url=url,
+            duration=duration
+        )
+        results.append(item)
+    return results
+
+
+def get_radio_program_data_per_type(playlist_id):
+    return build_program_list_by_hash(playlist_id, mode='radio')

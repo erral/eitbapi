@@ -15,6 +15,8 @@ def main(global_config, **settings):
     config.add_route('playlist', '/playlist/{playlist_id}')
     config.add_route('playlist-per-type', '/type-playlist/{playlist_id}')
     config.add_route('radio', '/radio')
+    config.add_route('radio-program-type-list', '/radio-program-type-list')
+    config.add_route('radio-playlist-per-type', '/type-rplaylist/{playlist_id}')
     config.add_route('radioplaylist', '/rplaylist/{playlist_id:[a-zA-Z0-9\.\-\/]+}')
     config.add_route('episode', '/episode/{episode_url:[a-zA-Z0-9\.\-\/]+}')
     config.scan()
