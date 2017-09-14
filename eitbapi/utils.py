@@ -14,13 +14,10 @@ else:
     PYTHON3 = False
 
 
-EITB_FRONT_PAGE_URL = "http://www.eitb.tv/eu/"
-EITB_EPISODE_LIST_REGEX = r"<li[^>]*>[^<]*<a href=\"\" onclick\=\"setPylstId\('(\d+)','([^']+)','([^']+)'\)\;"  # noqa
 EITB_PLAYLIST_BASE_URL = "http://www.eitb.tv/es/get/playlist/{}"
 EITB_VIDEO_BASE_URL = "http://www.eitb.tv/es/video/"
 EITB_VIDEO_URL = "http://www.eitb.tv/es/video/{}/{}/{}/{}/"
 
-EITB_RADIO_ITEMS_URL = "http://www.eitb.tv/es/radio/"
 EITB_BASE_URL = "http://www.eitb.tv/"
 
 EITB_TV_PROGRAM_LIST_XML_URL = 'http://www.eitb.tv/eu/menu/getMenu/tv/'
