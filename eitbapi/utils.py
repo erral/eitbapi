@@ -123,8 +123,17 @@ def get_radio_program_data():
 def get_radio_program_types():
     menudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
-    menu_hash = menudict.get('por_categorias', {}).get('submenu', {}).get('hash', '')
-    categorydata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL + '/' + menu_hash)
+    menu_hash = menudict.get('por_categorias', {}).get('submenu', {}).get('hash', '')  # noqa
+    categorydata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL + '/' + menu_hash)  # noqa
+    categorydict = xml_to_dict(categorydata.content)
+    return categorydict
+
+
+def get_radio_stations():
+    menudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL)
+    menudict = xml_to_dict(menudata.content)
+    menu_hash = menudict.get('por_emisoras', {}).get('submenu', {}).get('hash', '')  # noqa
+    categorydata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL + '/' + menu_hash)  # noqa
     categorydict = xml_to_dict(categorydata.content)
     return categorydict
 
@@ -252,3 +261,7 @@ def get_radio_programs(playlist_id):
 
 def get_radio_program_data_per_type(playlist_id):
     return build_program_list_by_hash(playlist_id, mode='radio', first=True)
+
+
+def get_radio_program_data_per_station(station_id):
+    return build_program_list_by_hash(station_id, mode='radio', first=False)
