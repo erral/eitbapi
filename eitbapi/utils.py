@@ -186,22 +186,6 @@ def create_internal_video_url(playlist_title, playlist_id, video_title, video_id
     return request.route_url('episode', episode_url=internal_url)
 
 
-def create_video_url(playlist_title, playlist_id, video_title, video_id):
-    """create the URL of a given episode to be used with youtube-dl."""
-    playlist_title = clean_title(playlist_title)
-    video_title = clean_title(playlist_title)
-
-    return EITB_VIDEO_URL.format(playlist_title, playlist_id, video_id, video_title)  # noqa
-
-
-def get_video_urls(playlist_title, playlist_id, video_title, video_id):
-    """helper method to get the information from youtube-dl"""
-    ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
-    url = create_video_url(playlist_title, playlist_id, video_title, video_id)
-    result = ydl.extract_info(url, download=False)
-    return result
-
-
 def clean_title(title):
     """slugify the titles using the method that EITB uses in
        the website:
