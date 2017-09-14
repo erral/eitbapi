@@ -74,11 +74,11 @@ def xml_to_dict(data):
     return d
 
 
-def build_program_list_by_hash(menu_hash, mode='tv'):
+def build_program_list_by_hash(menu_hash, mode='tv', first=False):
     if mode == 'tv':
-        results = get_tv_submenu_data(menu_hash, first=True)
+        results = get_tv_submenu_data(menu_hash, first=first)
     elif mode == 'radio':
-        results = get_radio_submenu_data(menu_hash)
+        results = get_radio_submenu_data(menu_hash, first=first)
     return results
 
 
@@ -86,7 +86,7 @@ def get_tv_program_data():
     menudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
     menu_hash = menudict.get('programas_az', {}).get('submenu', {}).get('hash', '')
-    return build_program_list_by_hash(menu_hash, mode='tv')
+    return build_program_list_by_hash(menu_hash, mode='tv', first=True)
 
 
 def get_tv_program_data_per_type(menu_hash):
@@ -116,7 +116,7 @@ def get_radio_program_data():
     menudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
     menu_hash = menudict.get('programas_az', {}).get('submenu', {}).get('hash', None)
-    results = get_radio_submenu_data(menu_hash)
+    results = get_radio_submenu_data(menu_hash, first=True)
     return results
 
 
@@ -150,14 +150,17 @@ def get_tv_submenu_data(menu_hash, pretitle='', first=False):
     return results
 
 
-def get_radio_submenu_data(menu_hash, pretitle=''):
+def get_radio_submenu_data(menu_hash, pretitle='', first=False):
     submenudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL + '/' + menu_hash)
     submenudict = xml_to_dict(submenudata.content)
     results = []
     for item in submenudict.values():
         subhash = item.get('submenu', {}).get('hash', None)
         if subhash:
-            results += get_radio_submenu_data(subhash, pretitle=item.get('title').get('text'))
+            if first:
+                results += get_radio_submenu_data(subhash)
+            else:
+                results += get_radio_submenu_data(subhash, pretitle=item.get('title').get('text'))
 
         data = {}
         data['title'] = (pretitle + ' ' + item.get('title', {}).get('text', '')).strip()
@@ -248,4 +251,4 @@ def get_radio_programs(playlist_id):
 
 
 def get_radio_program_data_per_type(playlist_id):
-    return build_program_list_by_hash(playlist_id, mode='radio')
+    return build_program_list_by_hash(playlist_id, mode='radio', first=True)
