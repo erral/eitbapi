@@ -210,16 +210,6 @@ def clean_title(title):
     return val.lower()
 
 
-def extract_radio_info_from_url(url):
-    """ /eu/irratia/gaztea/akabo-bakea/3601966/" """
-    _, lang, _, radio, lowertitle, id, _ = url.split('/')
-    return dict(
-        id=url[1:],
-        title=lowertitle.replace('-', ' ').capitalize(),
-        radio=radio.replace('-', ' ').capitalize(),
-    )
-
-
 def get_radio_programs(playlist_id):
     results = []
     data = requests.get(EITB_BASE_URL + playlist_id)
