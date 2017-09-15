@@ -60,7 +60,7 @@ def program_type_list(request):
         'member': []
     }
     member = []
-    categorydict = get_tv_program_types(request)
+    categorydict = get_tv_program_types()
     for categoryname, categoryvalues in categorydict.items():
         item = {
             '@id': request.route_url('playlist-per-type', playlist_id=categoryvalues.get('submenu', {}).get('hash', '')),
@@ -84,7 +84,7 @@ def program_type_news(request):
         'member': []
     }
     member = []
-    categorydict = get_tv_news_programs(request)
+    categorydict = get_tv_news_programs()
     for categoryname, categoryvalues in categorydict.items():
         item = {
             '@id': request.route_url('playlist-per-type', playlist_id=categoryvalues.get('submenu', {}).get('hash', '')),
@@ -141,14 +141,14 @@ def playlist(request):
             pubdate = datetime.datetime.strptime(pubdatestr, dateformat)
             pubdate = tz.localize(pubdate)
             pubdateiso = pubdate.isoformat()
-        except:
+        except (TypeError, ValueError):
             pubdateiso = pubdatestr
 
         try:
             broadcastdate = datetime.datetime.strptime(broadcastdatestr, dateformat)
             broadcastdate = tz.localize(broadcastdate)
             broadcastdateiso = broadcastdate.isoformat()
-        except:
+        except (TypeError, ValueError):
             broadcastdateiso = broadcastdatestr
 
         item = {
