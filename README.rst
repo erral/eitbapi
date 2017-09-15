@@ -9,6 +9,10 @@ A pyramid_ app to expose an API for `EITB Nahieran`_ (unofficial)
 .. image:: https://coveralls.io/repos/github/erral/eitbapi/badge.svg
     :target: https://coveralls.io/github/erral/eitbapi
 
+.. image:: https://landscape.io/github/erral/eitbapi/master/landscape.svg?style=flat
+    :target: https://landscape.io/github/erral/eitbapi/master
+    :alt: Code Health
+
 
 View API online
 ===============
