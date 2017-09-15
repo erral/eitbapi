@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import requests
 import sys
 import xml.etree.ElementTree as ET
-import youtube_dl
+
 
 if sys.version_info >= (3, 0, 0):
     # for Python 3
