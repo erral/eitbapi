@@ -90,7 +90,7 @@ def get_tv_program_data_per_type(menu_hash):
     return build_program_list_by_hash(menu_hash, mode='tv')
 
 
-def get_tv_program_types(request):
+def get_tv_program_types():
     menudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
     menu_hash = menudict.get('por_categorias', {}).get('submenu', {}).get('hash', '')  # noqa
@@ -99,7 +99,7 @@ def get_tv_program_types(request):
     return categorydict
 
 
-def get_tv_news_programs(request):
+def get_tv_news_programs():
     menudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
     menu_hash = menudict.get('informativos', {}).get('submenu', {}).get('hash', '')  # noqa
