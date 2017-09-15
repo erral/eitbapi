@@ -141,14 +141,14 @@ def playlist(request):
             pubdate = datetime.datetime.strptime(pubdatestr, dateformat)
             pubdate = tz.localize(pubdate)
             pubdateiso = pubdate.isoformat()
-        except:
+        except ValueError:
             pubdateiso = pubdatestr
 
         try:
             broadcastdate = datetime.datetime.strptime(broadcastdatestr, dateformat)
             broadcastdate = tz.localize(broadcastdate)
             broadcastdateiso = broadcastdate.isoformat()
-        except:
+        except ValueError:
             broadcastdateiso = broadcastdatestr
 
         item = {
