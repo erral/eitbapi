@@ -55,7 +55,7 @@ def safe_encode(value, charset='utf-8'):
 def xml_to_dict(data):
     try:
         root = ET.fromstring(data)
-    except:
+    except ET.ParseError:
         root = []
     d = {}
     for item in root:
