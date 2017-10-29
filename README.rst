@@ -27,7 +27,7 @@ To run and install localy, create a virtualenv first and then::
 
   $ pip install -r requirements.txt
   $ pip install -e .
-  $ pserver development.ini --reload
+  $ pserve development.ini --reload
 
 
 Deployment on Heroku
