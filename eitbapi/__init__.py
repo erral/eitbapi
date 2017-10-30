@@ -1,11 +1,33 @@
 from pyramid.config import Configurator
 from pyramid.renderers import JSON
+from .cors import cors_options_view
+from .cors import NO_PERMISSION_REQUIRED
+from .cors import add_cors_preflight_handler
+from .cors import CorsPreflightPredicate
+from .cors import add_cors_to_response
 
 
 def main(global_config, **settings):
     """This function returns a Pyramid WSGI application."""
     config = Configurator(settings=settings)
     config.include('pyramid_chameleon')
+
+    config.add_directive(
+        'add_cors_preflight_handler', add_cors_preflight_handler)
+    config.add_route_predicate('cors_preflight', CorsPreflightPredicate)
+
+    config.add_subscriber(add_cors_to_response, 'pyramid.events.NewResponse')
+
+    config.add_route(
+        'cors-options-preflight', '/{catch_all:.*}',
+        cors_preflight=True,
+    )
+    config.add_view(
+        cors_options_view,
+        route_name='cors-options-preflight',
+        permission=NO_PERMISSION_REQUIRED,
+    )
+
     config.add_renderer('prettyjson', JSON(indent=4, sort_keys=True))
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('home', '/')
