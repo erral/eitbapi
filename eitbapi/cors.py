@@ -50,7 +50,7 @@ def cors_options_view(context, request):
     response = request.response
     if 'Access-Control-Request-Headers' in request.headers:
         response.headers['Access-Control-Allow-Methods'] = (
-            'OPTIONS,HEAD,GET,POST,PUT,DELETE')
+            'OPTIONS,HEAD,GET')
     response.headers['Access-Control-Allow-Headers'] = (
         'Content-Type,Accept,Accept-Language,Authorization,X-Request-ID')
     return response
