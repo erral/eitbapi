@@ -211,6 +211,9 @@ def clean_title(title):
 
 
 def get_radio_programs(playlist_id):
+    while playlist_id.startswith('/'):
+        playlist_id = playlist_id[1:]
+
     results = []
     data = requests.get(EITB_BASE_URL + playlist_id)
     soup = BeautifulSoup(data.text, "html.parser")

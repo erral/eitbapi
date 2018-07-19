@@ -27,8 +27,11 @@ def radio(request):
     results = []
 
     for item in menudata:
+        pl_id = item.get('id')
+        while pl_id.startswith('/'):
+            pl_id = pl_id[1:]
         data = {
-            '@id': request.route_url('radioplaylist', playlist_id=item.get('id')),
+            '@id': request.route_url('radioplaylist', playlist_id=pl_id),
             '@type': 'Radio Playlist',
             'title': safe_encode(item.get('title')),
             'description': '',
