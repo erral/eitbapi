@@ -14,14 +14,14 @@ else:
     PYTHON3 = False
 
 
-EITB_PLAYLIST_BASE_URL = "http://www.eitb.tv/es/get/playlist/{}"
-EITB_VIDEO_BASE_URL = "http://www.eitb.tv/es/video/"
-EITB_VIDEO_URL = "http://www.eitb.tv/es/video/{}/{}/{}/{}/"
+EITB_PLAYLIST_BASE_URL = "https://mam.eitb.eus/mam/REST/ServiceMultiweb/Playlist/MULTIWEBTV/{}"
+EITB_VIDEO_BASE_URL = "https://www.eitb.tv/es/video/"
+EITB_VIDEO_URL = "https://www.eitb.tv/es/video/{}/{}/{}/{}/"
 
-EITB_BASE_URL = "http://www.eitb.tv/"
+EITB_BASE_URL = "https://www.eitb.tv/"
 
-EITB_TV_PROGRAM_LIST_XML_URL = 'http://www.eitb.tv/eu/menu/getMenu/tv/'
-EITB_RADIO_PROGRAM_LIST_XML_URL = 'http://www.eitb.tv/es/menu/getMenu/radio/'
+EITB_TV_PROGRAM_LIST_XML_URL = 'https://www.eitb.tv/eu/menu/getMenu/tv/'
+EITB_RADIO_PROGRAM_LIST_XML_URL = 'https://www.eitb.tv/es/menu/getMenu/radio/'
 
 
 def safe_unicode(value, encoding='utf-8'):
