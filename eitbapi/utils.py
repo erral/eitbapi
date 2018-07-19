@@ -14,7 +14,7 @@ else:
     PYTHON3 = False
 
 
-EITB_PLAYLIST_BASE_URL = "https://www.eitb.tv/es/get/playlist/{}"
+EITB_PLAYLIST_BASE_URL = "https://mam.eitb.eus/mam/REST/ServiceMultiweb/Playlist/MULTIWEBTV/{}"
 EITB_VIDEO_BASE_URL = "https://www.eitb.tv/es/video/"
 EITB_VIDEO_URL = "https://www.eitb.tv/es/video/{}/{}/{}/{}/"
 
