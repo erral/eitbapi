@@ -92,8 +92,8 @@ def get_tv_program_data():
     try:
         result = res.json()
     except:
-        result = '[]'
-    return json.loads(result)
+        result = []
+    return result
 
 
 def _get_tv_program_data():
