@@ -1,13 +1,14 @@
 language: python
 python:
   - 2.7
-  - 3.5
   - 3.6
+  - 3.7
 
 env:
   - PYRAMID_VERSION=1.7
   - PYRAMID_VERSION=1.8
   - PYRAMID_VERSION=1.9
+  - PYRAMID_VERSION=1.10
 # command to install dependencies
 install:
   - sed -ie "s#pyramid==1.7.3#pyramid>=$PYRAMID_VERSION,<$PYRAMID_VERSION.999999#" requirements.txt
@@ -15,8 +16,7 @@ install:
   - pip install -e ".[testing]"
   - pip install -e .
 # command to run tests
-script:
-  coverage run --source=eitbapi setup.py test
+script: coverage run --source=eitbapi setup.py test
 after_success:
   - pip install coveralls
   - coveralls
