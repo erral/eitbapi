@@ -1,6 +1,6 @@
 beautifulsoup4==4.5.1
 certifi==2019.6.16
-Chameleon==2.25
+Chameleon==3.6.2
 chardet==3.0.4
 CherryPy==8.1.2
 coverage==4.2
