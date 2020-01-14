@@ -279,6 +279,7 @@ def clean_title(title):
         '@': '',
         ' ': '-',
         '&': '',
+        '#': '',
     }
 
     val = title.upper()
