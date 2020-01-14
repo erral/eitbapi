@@ -30,6 +30,6 @@ venusian==1.0
 waitress==1.4.2
 WebOb==1.8.5
 WebTest==2.0.23
-youtube-dl==2017.1.2
+youtube-dl==2020.1.1
 zope.deprecation==4.2.0
 zope.interface==4.3.2
