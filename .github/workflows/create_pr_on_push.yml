@@ -1,15 +1,19 @@
 name: Create PR on push
 
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - master
 
 jobs:
-  build:
+  auto-pull-request:
+    name: PullRequestAction
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch-suffix: timestamp
+      - name: pull-request-action
+        uses: vsoch/pull-request-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_PREFIX: "update/"
+          PULL_REQUEST_BRANCH: "master"
+          BRANCH_PREFIX: "create-pull-request"
