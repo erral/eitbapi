@@ -1,4 +1,4 @@
-on: check_run
+on: [check_run]
 name: merge_and_cleanup
 jobs:
   build:
