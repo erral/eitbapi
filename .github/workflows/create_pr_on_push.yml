@@ -16,3 +16,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PULL_REQUEST_BRANCH: "master"
           BRANCH_PREFIX: "create-pull-request"
+          PULL_REQUEST_TITLE: "This is an automated PR to update the cache"
+          PULL_REQUEST_BODY: "This PR was created automatically"
