@@ -22,7 +22,7 @@ EITB_PLAYLIST_BASE_URL = (
 )
 EITB_VIDEO_BASE_URL = "https://www.eitb.tv/es/video/"
 EITB_VIDEO_URL = "https://www.eitb.tv/es/video/{}/{}/{}/{}/"
-
+EITB_LAST_VIDEO_URL = 'https://mam.eitb.eus/mam/REST/ServiceMultiweb/SmartPlaylistByDestination/MULTIWEBTV/12/BROADCST_DATE/DESC/{}/'
 EITB_BASE_URL = "https://www.eitb.tv/"
 
 EITB_CACHED_PROGRAM_LIST_XML_URL = (
@@ -131,6 +131,11 @@ def get_tv_news_programs():
     return categorydict
 
 
+def get_last_tv_program_data(number_of_items):
+    listdata = requests.get(EITB_LAST_VIDEO_URL.format(25))
+    listjson = json.loads(listdata.content)['web_media']
+    return listjson
+
 def get_radio_program_data():
     results = []
     menudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL)
@@ -173,6 +178,7 @@ def get_tv_submenu_data(menu_hash, pretitle='', first=False):
     submenudict = xml_to_dict(submenudata.content)
     results = []
     for item in submenudict.values():
+        #print(item)
         subhash = item.get('submenu', {}).get('hash', None)
         if subhash:
             if first:

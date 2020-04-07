@@ -5,8 +5,10 @@ from eitbapi.utils import EITB_PLAYLIST_BASE_URL
 from eitbapi.utils import EITB_VIDEO_BASE_URL
 from eitbapi.utils import get_tv_news_programs
 from eitbapi.utils import get_tv_program_data
+from eitbapi.utils import _get_tv_program_data
 from eitbapi.utils import get_tv_program_data_per_type
 from eitbapi.utils import get_tv_program_types
+from eitbapi.utils import get_last_tv_program_data
 from eitbapi.utils import safe_encode
 from pyramid.view import view_config
 
@@ -17,6 +19,7 @@ import youtube_dl
 
 
 def prepare_program_list(request, menudata):
+
     result = {
         '@context': 'http://www.w3.org/ns/hydra/context.jsonld',
         '@id': request.route_url('programs'),
@@ -27,6 +30,7 @@ def prepare_program_list(request, menudata):
     results = []
 
     for item in menudata:
+        print("ITEM OF PROGRAM: ", item)
         data = {
             '@id': request.route_url('playlist', playlist_id=item.get('id')),
             '@type': 'Playlist',
@@ -46,7 +50,9 @@ def programs(request):
     """get all information about all the programs.
     How: scrap the website and look for the javascript links.
     """
-    menudata = get_tv_program_data()
+    print("Step 1")
+    menudata = _get_tv_program_data()
+    print("FINISH: ",prepare_program_list(request, menudata))
     return prepare_program_list(request, menudata)
 
 
@@ -211,3 +217,26 @@ def episode(request):
 
     result.update(video_data)
     return result
+
+
+@view_config(route_name='last-program-list', renderer='prettyjson')
+def last_program_list(request):
+    number_of_items = request.matchdict['number_of_items']
+    last_list = get_last_tv_program_data(number_of_items)
+    data = []
+    for item in last_list:
+        data.append({
+        "thumnail_url":item['THUMBNAIL_URL'],
+        "fanart_url":item['STILL_URL'],
+        "name_eu":item['NAME_EU'],
+        "name_es":item['NAME_ES'],
+        "date":item['BROADCST_DATE'],
+        "cahnnel":item['BROADCST_CHANNEL'],
+        "product_code":item['PRODUCT_CODE'],
+        "assets_id":item['ASSET_ID'],
+        "id_web_media":item['ID_WEB_MEDIA'],
+        "id":item['ID']
+        })
+        
+    
+    return data
