@@ -175,7 +175,7 @@ def playlist(request):
         if item not in member:
             member.append(item)
 
-    playlist_data['member'] = sorted(member, key=lambda x: x.get('broadcast_date'), reverse=True)
+    playlist_data['member'] = sorted(member, key=lambda x: x.get('broadcast_date', "") or "", reverse=True)
 
     del playlist_data['id']
 
