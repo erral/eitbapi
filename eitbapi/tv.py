@@ -241,7 +241,7 @@ def last_program_list(request):
                 item.get('ID_WEB_MEDIA'),
                 request=request,
             ),
-            '@type': 'Last',
+            '@type': 'Last tv shows',
             'title': item.get('NAME_{}'.format(language)),
             'title_eu': item.get('NAME_EU'),
             'title_es': item.get('NAME_ES'),
