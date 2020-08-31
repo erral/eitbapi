@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 import os
 import json
 import datetime
+import pytz
 
 
 if sys.version_info >= (3, 0, 0):
@@ -23,6 +24,7 @@ EITB_PLAYLIST_BASE_URL = (
 EITB_VIDEO_BASE_URL = "https://www.eitb.tv/es/video/"
 EITB_VIDEO_URL = "https://www.eitb.tv/es/video/{}/{}/{}/{}/"
 EITB_LAST_VIDEO_URL = 'https://mam.eitb.eus/mam/REST/ServiceMultiweb/SmartPlaylistByDestination/MULTIWEBTV/12/BROADCST_DATE/DESC/{}/'
+EITB_LAST_VIDEO_MEDIA_URL = 'https://mam.eitb.eus/mam/REST/ServiceMultiweb/Video2/MULTIWEBTV/'
 EITB_BASE_URL = "https://www.eitb.tv/"
 
 EITB_CACHED_PROGRAM_LIST_XML_URL = (
@@ -132,8 +134,8 @@ def get_tv_news_programs():
 
 
 def get_last_tv_program_data(number_of_items):
-    listdata = requests.get(EITB_LAST_VIDEO_URL.format(25))
-    listjson = json.loads(listdata.content)['web_media']
+    listdata = requests.get(EITB_LAST_VIDEO_URL.format(number_of_items))
+    listjson = json.loads(listdata.content)
     return listjson
 
 def get_radio_program_data():
@@ -318,3 +320,18 @@ def get_radio_program_data_per_type(playlist_id):
 
 def get_radio_program_data_per_station(station_id):
     return build_program_list_by_hash(station_id, mode='radio', first=False)
+
+
+
+# PARSE DATE TO ISO FORMAT
+def date_to_iso_format(date):
+    dateformat = '%Y-%m-%d %H:%M:%S'
+    tz = pytz.timezone('Europe/Madrid')
+    try:
+        date_to_format = datetime.datetime.strptime(date, dateformat)
+        date_to_format = tz.localize(date_to_format)
+        dateiso = date_to_format.isoformat()
+    except (TypeError, ValueError):
+        dateiso = date
+    
+    return dateiso

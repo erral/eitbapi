@@ -10,6 +10,8 @@ from eitbapi.utils import get_tv_program_data_per_type
 from eitbapi.utils import get_tv_program_types
 from eitbapi.utils import get_last_tv_program_data
 from eitbapi.utils import safe_encode
+from eitbapi.utils import date_to_iso_format
+
 from pyramid.view import view_config
 
 import datetime
@@ -40,7 +42,8 @@ def prepare_program_list(request, menudata):
         if data not in results:
             results.append(data)
 
-    result['member'] = sorted(results, key=lambda x: x.get('title', u'').lower())
+    result['member'] = sorted(
+        results, key=lambda x: x.get('title', u'').lower())
 
     return result
 
@@ -51,8 +54,8 @@ def programs(request):
     How: scrap the website and look for the javascript links.
     """
     print("Step 1")
-    menudata = _get_tv_program_data()
-    print("FINISH: ",prepare_program_list(request, menudata))
+    menudata = get_tv_program_data()
+    print("FINISH: ", prepare_program_list(request, menudata))
     return prepare_program_list(request, menudata)
 
 
@@ -151,7 +154,8 @@ def playlist(request):
             pubdateiso = pubdatestr
 
         try:
-            broadcastdate = datetime.datetime.strptime(broadcastdatestr, dateformat)
+            broadcastdate = datetime.datetime.strptime(
+                broadcastdatestr, dateformat)
             broadcastdate = tz.localize(broadcastdate)
             broadcastdateiso = broadcastdate.isoformat()
         except (TypeError, ValueError):
@@ -181,7 +185,8 @@ def playlist(request):
         if item not in member:
             member.append(item)
 
-    playlist_data['member'] = sorted(member, key=lambda x: x.get('broadcast_date'), reverse=True)
+    playlist_data['member'] = sorted(
+        member, key=lambda x: x.get('broadcast_date'), reverse=True)
 
     del playlist_data['id']
 
@@ -198,7 +203,8 @@ def episode(request):
 
     url = EITB_VIDEO_BASE_URL + episode_url
     try:
-        playlist_title, playlist_id, video_title, video_id = episode_url.split('/')
+        playlist_title, playlist_id, video_title, video_id = episode_url.split(
+            '/')
     except ValueError:
         return {}
 
@@ -221,22 +227,32 @@ def episode(request):
 
 @view_config(route_name='last-program-list', renderer='prettyjson')
 def last_program_list(request):
-    number_of_items = request.matchdict['number_of_items']
-    last_list = get_last_tv_program_data(number_of_items)
+    number_of_items = request.params.get('items', 25)
+    playlist_data = get_last_tv_program_data(number_of_items)
+    web_media = playlist_data['web_media']
     data = []
-    for item in last_list:
+    for item in web_media:
+        language = item.get("IDIOMA", "")
         data.append({
-        "thumnail_url":item['THUMBNAIL_URL'],
-        "fanart_url":item['STILL_URL'],
-        "name_eu":item['NAME_EU'],
-        "name_es":item['NAME_ES'],
-        "date":item['BROADCST_DATE'],
-        "cahnnel":item['BROADCST_CHANNEL'],
-        "product_code":item['PRODUCT_CODE'],
-        "assets_id":item['ASSET_ID'],
-        "id_web_media":item['ID_WEB_MEDIA'],
-        "id":item['ID']
+            '@id': create_internal_video_url(
+                playlist_data.get('name_playlist'),
+                playlist_data.get('id_web_playlist'),
+                item.get('NAME_ES'),
+                item.get('ID_WEB_MEDIA'),
+                request=request,
+            ),
+            '@type': 'Last',
+            'title': item.get('NAME_{}'.format(language)),
+            'title_eu': item.get('NAME_EU'),
+            'title_es': item.get('NAME_ES'),
+            'description': item.get('SHORT_DESC_{}'.format(language)),
+            'description_eu': item.get('SHORT_DESC_EU', ''),
+            'description_es': item.get('SHORT_DESC_ES', ''),
+            'publication_date': date_to_iso_format(item.get('PUB_DATE', '')),
+            'broadcast_date': date_to_iso_format(item.get('BROADCST_DATE', '')),
+            'episode_image': item.get('STILL_URL', ''),
+            'episode_image_thumbnail': item.get('THUMBNAIL_URL', ''),
+            'language': language.lower()
         })
-        
-    
+
     return data
