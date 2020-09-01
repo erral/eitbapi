@@ -63,6 +63,10 @@
                 <a class="btn btn-default btn-lg" href="${request.route_url('program-type-news')}">
                   Albistegi zerrenda ikusi
                 </a>
+                 <a class="btn btn-default btn-lg" href="${request.route_url('last-broadcast-list')}">
+                  Azken telebista saioak
+                </a>
+                <small>*Elementu kopuru jakin bat eskatzeko:  <a href="${request.route_url('last-broadcast-list')}?items=50" style="font-style:italic">?items=50</a>. Balio lehenetsia: 25</small>
               </div>
             </div>
             <div class="col-sm-6">

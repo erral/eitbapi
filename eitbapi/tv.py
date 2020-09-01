@@ -8,6 +8,8 @@ from eitbapi.utils import get_tv_program_data
 from eitbapi.utils import get_tv_program_data_per_type
 from eitbapi.utils import get_tv_program_types
 from eitbapi.utils import safe_encode
+from eitbapi.utils import get_last_broadcast_data
+from eitbapi.utils import date_to_iso_format
 from pyramid.view import view_config
 
 import datetime
@@ -211,3 +213,35 @@ def episode(request):
 
     result.update(video_data)
     return result
+
+@view_config(route_name='last-broadcast-list', renderer='prettyjson')
+def last_broadcast_list(request):
+    number_of_items = request.params.get('items', 25)
+    playlist_data = get_last_broadcast_data(number_of_items)
+    web_media = playlist_data['web_media']
+    data = []
+    for item in web_media:
+        language = item.get("IDIOMA", "")
+        data.append({
+            '@id': create_internal_video_url(
+                # playlist_data.get('name_playlist'),
+                item.get('NAME_{}'.format(language)),
+                playlist_data.get('id_web_playlist'),
+                item.get('NAME_ES'),
+                item.get('ID_WEB_MEDIA'),
+                request=request,
+            ),
+            '@type': 'Last tv shows',
+            'title': item.get('NAME_{}'.format(language)),
+            'title_eu': item.get('NAME_EU'),
+            'title_es': item.get('NAME_ES'),
+            'description': item.get('SHORT_DESC_{}'.format(language)),
+            'description_eu': item.get('SHORT_DESC_EU', ''),
+            'description_es': item.get('SHORT_DESC_ES', ''),
+            'publication_date': date_to_iso_format(item.get('PUB_DATE', '')),
+            'broadcast_date': date_to_iso_format(item.get('BROADCST_DATE', '')),
+            'episode_image': item.get('STILL_URL', ''),
+            'episode_image_thumbnail': item.get('THUMBNAIL_URL', ''),
+            'language': language.lower()
+        })
+    return data
