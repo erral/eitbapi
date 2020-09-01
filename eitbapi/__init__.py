@@ -10,21 +10,19 @@ from .cors import add_cors_to_response
 def main(global_config, **settings):
     """This function returns a Pyramid WSGI application."""
     config = Configurator(settings=settings)
-    config.include('pyramid_chameleon')
+    config.include("pyramid_chameleon")
 
-    config.add_directive(
-        'add_cors_preflight_handler', add_cors_preflight_handler)
-    config.add_route_predicate('cors_preflight', CorsPreflightPredicate)
+    config.add_directive("add_cors_preflight_handler", add_cors_preflight_handler)
+    config.add_route_predicate("cors_preflight", CorsPreflightPredicate)
 
-    config.add_subscriber(add_cors_to_response, 'pyramid.events.NewResponse')
+    config.add_subscriber(add_cors_to_response, "pyramid.events.NewResponse")
 
     config.add_route(
-        'cors-options-preflight', '/{catch_all:.*}',
-        cors_preflight=True,
+        "cors-options-preflight", "/{catch_all:.*}", cors_preflight=True,
     )
     config.add_view(
         cors_options_view,
-        route_name='cors-options-preflight',
+        route_name="cors-options-preflight",
         permission=NO_PERMISSION_REQUIRED,
     )
 

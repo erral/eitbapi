@@ -28,13 +28,13 @@ EITB_LAST_VIDEO_MEDIA_URL = 'https://mam.eitb.eus/mam/REST/ServiceMultiweb/Video
 EITB_BASE_URL = "https://www.eitb.tv/"
 
 EITB_CACHED_PROGRAM_LIST_XML_URL = (
-    'https://raw.githubusercontent.com/erral/eitbapi/master/cache.json'
+    "https://raw.githubusercontent.com/erral/eitbapi/master/cache.json"
 )
-EITB_TV_PROGRAM_LIST_XML_URL = 'https://www.eitb.tv/eu/menu/getMenu/tv/'
-EITB_RADIO_PROGRAM_LIST_XML_URL = 'https://www.eitb.tv/es/menu/getMenu/radio/'
+EITB_TV_PROGRAM_LIST_XML_URL = "https://www.eitb.tv/eu/menu/getMenu/tv/"
+EITB_RADIO_PROGRAM_LIST_XML_URL = "https://www.eitb.tv/es/menu/getMenu/radio/"
 
 
-def safe_unicode(value, encoding='utf-8'):
+def safe_unicode(value, encoding="utf-8"):
     if PYTHON3:
         if isinstance(value, bytes):
             return value
@@ -42,7 +42,7 @@ def safe_unicode(value, encoding='utf-8'):
             try:
                 value = bytes(value, encoding)
             except (UnicodeDecodeError):
-                value = value.decode('utf-8', 'replace')
+                value = value.decode("utf-8", "replace")
         return value
     else:
         if isinstance(value, unicode):
@@ -51,11 +51,11 @@ def safe_unicode(value, encoding='utf-8'):
             try:
                 value = unicode(value, encoding)
             except (UnicodeDecodeError):
-                value = value.decode('utf-8', 'replace')
+                value = value.decode("utf-8", "replace")
         return value
 
 
-def safe_encode(value, charset='utf-8'):
+def safe_encode(value, charset="utf-8"):
     if PYTHON3:
         return safe_unicode(value, charset).decode(charset)
     else:
@@ -72,19 +72,19 @@ def xml_to_dict(data):
         dd = {}
         for subitem in item:
             m = {}
-            m['text'] = subitem.text
+            m["text"] = subitem.text
             m.update(subitem.attrib)
             dd[subitem.tag] = m
 
-        d[dd['title']['text']] = dd
+        d[dd["title"]["text"]] = dd
 
     return d
 
 
-def build_program_list_by_hash(menu_hash, mode='tv', first=False):
-    if mode == 'tv':
+def build_program_list_by_hash(menu_hash, mode="tv", first=False):
+    if mode == "tv":
         results = get_tv_submenu_data(menu_hash, first=first)
-    elif mode == 'radio':
+    elif mode == "radio":
         results = get_radio_submenu_data(menu_hash, first=first)
     return results
 
@@ -102,22 +102,22 @@ def _get_tv_program_data():
     menudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
     menu_hash = (
-        menudict.get('programas_az', {}).get('submenu', {}).get('hash', '')
+        menudict.get("programas_az", {}).get("submenu", {}).get("hash", "")
     )  # noqa
-    return build_program_list_by_hash(menu_hash, mode='tv', first=True)
+    return build_program_list_by_hash(menu_hash, mode="tv", first=True)
 
 
 def get_tv_program_data_per_type(menu_hash):
-    return build_program_list_by_hash(menu_hash, mode='tv')
+    return build_program_list_by_hash(menu_hash, mode="tv")
 
 
 def get_tv_program_types():
     menudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
     menu_hash = (
-        menudict.get('por_categorias', {}).get('submenu', {}).get('hash', '')
+        menudict.get("por_categorias", {}).get("submenu", {}).get("hash", "")
     )  # noqa
-    categorydata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL + '/' + menu_hash)
+    categorydata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL + "/" + menu_hash)
     categorydict = xml_to_dict(categorydata.content)
     return categorydict
 
@@ -126,9 +126,9 @@ def get_tv_news_programs():
     menudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
     menu_hash = (
-        menudict.get('informativos', {}).get('submenu', {}).get('hash', '')
+        menudict.get("informativos", {}).get("submenu", {}).get("hash", "")
     )  # noqa
-    categorydata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL + '/' + menu_hash)
+    categorydata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL + "/" + menu_hash)
     categorydict = xml_to_dict(categorydata.content)
     return categorydict
 
@@ -143,7 +143,7 @@ def get_radio_program_data():
     menudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
     menu_hash = (
-        menudict.get('programas_az', {}).get('submenu', {}).get('hash', None)
+        menudict.get("programas_az", {}).get("submenu", {}).get("hash", None)
     )  # noqa
     results = get_radio_submenu_data(menu_hash, first=True)
     return results
@@ -153,10 +153,10 @@ def get_radio_program_types():
     menudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
     menu_hash = (
-        menudict.get('por_categorias', {}).get('submenu', {}).get('hash', '')
+        menudict.get("por_categorias", {}).get("submenu", {}).get("hash", "")
     )  # noqa
     categorydata = requests.get(
-        EITB_RADIO_PROGRAM_LIST_XML_URL + '/' + menu_hash
+        EITB_RADIO_PROGRAM_LIST_XML_URL + "/" + menu_hash
     )  # noqa
     categorydict = xml_to_dict(categorydata.content)
     return categorydict
@@ -166,17 +166,17 @@ def get_radio_stations():
     menudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
     menu_hash = (
-        menudict.get('por_emisoras', {}).get('submenu', {}).get('hash', '')
+        menudict.get("por_emisoras", {}).get("submenu", {}).get("hash", "")
     )  # noqa
     categorydata = requests.get(
-        EITB_RADIO_PROGRAM_LIST_XML_URL + '/' + menu_hash
+        EITB_RADIO_PROGRAM_LIST_XML_URL + "/" + menu_hash
     )  # noqa
     categorydict = xml_to_dict(categorydata.content)
     return categorydict
 
 
-def get_tv_submenu_data(menu_hash, pretitle='', first=False):
-    submenudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL + '/' + menu_hash)
+def get_tv_submenu_data(menu_hash, pretitle="", first=False):
+    submenudata = requests.get(EITB_TV_PROGRAM_LIST_XML_URL + "/" + menu_hash)
     submenudict = xml_to_dict(submenudata.content)
     results = []
     for item in submenudict.values():
@@ -187,42 +187,42 @@ def get_tv_submenu_data(menu_hash, pretitle='', first=False):
                 results += get_tv_submenu_data(subhash)
             else:
                 results += get_tv_submenu_data(
-                    subhash, pretitle=item.get('title').get('text')
+                    subhash, pretitle=item.get("title").get("text")
                 )  # noqa
 
         data = {}
-        data['title'] = (
-            pretitle + ' ' + item.get('title', {}).get('text', '')
+        data["title"] = (
+            pretitle + " " + item.get("title", {}).get("text", "")
         ).strip()  # noqa
-        data['id'] = item.get('id', {}).get('text', '')
-        if data['id']:
+        data["id"] = item.get("id", {}).get("text", "")
+        if data["id"]:
             results.append(data)
 
     return results
 
 
-def get_radio_submenu_data(menu_hash, pretitle='', first=False):
+def get_radio_submenu_data(menu_hash, pretitle="", first=False):
     submenudata = requests.get(
-        EITB_RADIO_PROGRAM_LIST_XML_URL + '/' + menu_hash
+        EITB_RADIO_PROGRAM_LIST_XML_URL + "/" + menu_hash
     )  # noqa
     submenudict = xml_to_dict(submenudata.content)
     results = []
     for item in submenudict.values():
-        subhash = item.get('submenu', {}).get('hash', None)
+        subhash = item.get("submenu", {}).get("hash", None)
         if subhash:
             if first:
                 results += get_radio_submenu_data(subhash)
             else:
                 results += get_radio_submenu_data(
-                    subhash, pretitle=item.get('title').get('text')
+                    subhash, pretitle=item.get("title").get("text")
                 )  # noqa
 
         data = {}
-        data['title'] = (
-            pretitle + ' ' + item.get('title', {}).get('text', '')
+        data["title"] = (
+            pretitle + " " + item.get("title", {}).get("text", "")
         ).strip()  # noqa
-        data['id'] = item.get('id', {}).get('text', '')
-        if data['id']:
+        data["id"] = item.get("id", {}).get("text", "")
+        if data["id"]:
             results.append(data)
 
     return results
@@ -235,10 +235,10 @@ def create_internal_video_url(
     playlist_title = clean_title(playlist_title)
     video_title = clean_title(playlist_title)
 
-    internal_url = '{}/{}/{}/{}'.format(
+    internal_url = "{}/{}/{}/{}".format(
         playlist_title, playlist_id, video_id, video_title
     )  # noqa
-    return request.route_url('episode', episode_url=internal_url)
+    return request.route_url("episode", episode_url=internal_url)
 
 
 def clean_title(title):
@@ -248,46 +248,46 @@ def clean_title(title):
        - method: string2url
     """
     translation_map = {
-        'À': 'A',
-        'Á': 'A',
-        'Â': 'A',
-        'Ã': 'A',
-        'Ä': 'A',
-        'Å': 'A',
-        'Æ': 'E',
-        'È': 'E',
-        'É': 'E',
-        'Ê': 'E',
-        'Ë': 'E',
-        'Ì': 'I',
-        'Í': 'I',
-        'Î': 'I',
-        'Ï': 'I',
-        'Ò': 'O',
-        'Ó': 'O',
-        'Ô': 'O',
-        'Ö': 'O',
-        'Ù': 'U',
-        'Ú': 'U',
-        'Û': 'U',
-        'Ü': 'U',
-        'Ñ': 'N',
-        '?': '',
-        '¿': '',
-        '!': '',
-        '¡': '',
-        ':': '',
-        '_': '-',
-        'º': '',
-        'ª': 'a',
-        ',': '',
-        '.': '',
-        '(': '',
-        ')': '',
-        '@': '',
-        ' ': '-',
-        '&': '',
-        '#': '',
+        "À": "A",
+        "Á": "A",
+        "Â": "A",
+        "Ã": "A",
+        "Ä": "A",
+        "Å": "A",
+        "Æ": "E",
+        "È": "E",
+        "É": "E",
+        "Ê": "E",
+        "Ë": "E",
+        "Ì": "I",
+        "Í": "I",
+        "Î": "I",
+        "Ï": "I",
+        "Ò": "O",
+        "Ó": "O",
+        "Ô": "O",
+        "Ö": "O",
+        "Ù": "U",
+        "Ú": "U",
+        "Û": "U",
+        "Ü": "U",
+        "Ñ": "N",
+        "?": "",
+        "¿": "",
+        "!": "",
+        "¡": "",
+        ":": "",
+        "_": "-",
+        "º": "",
+        "ª": "a",
+        ",": "",
+        ".": "",
+        "(": "",
+        ")": "",
+        "@": "",
+        " ": "-",
+        "&": "",
+        "#": "",
     }
 
     val = title.upper()
@@ -297,25 +297,25 @@ def clean_title(title):
 
 
 def get_radio_programs(playlist_id):
-    while playlist_id.startswith('/'):
+    while playlist_id.startswith("/"):
         playlist_id = playlist_id[1:]
 
     results = []
     data = requests.get(EITB_BASE_URL + playlist_id)
     soup = BeautifulSoup(data.text, "html.parser")
-    for li in soup.find_all('li', class_='audio_uno'):
-        title_p, date_p, download_p = li.find_all('p')
-        title = title_p.find('a').get('original-title')
+    for li in soup.find_all("li", class_="audio_uno"):
+        title_p, date_p, download_p = li.find_all("p")
+        title = title_p.find("a").get("original-title")
         date, duration = date_p.text.split()
-        url = download_p.find('a').get('href')
-        duration = duration.replace('(', '').replace(')', '')
+        url = download_p.find("a").get("href")
+        duration = duration.replace("(", "").replace(")", "")
         item = dict(title=title, date=date, url=url, duration=duration)
         results.append(item)
     return results
 
 
 def get_radio_program_data_per_type(playlist_id):
-    return build_program_list_by_hash(playlist_id, mode='radio', first=True)
+    return build_program_list_by_hash(playlist_id, mode="radio", first=True)
 
 
 def get_radio_program_data_per_station(station_id):
