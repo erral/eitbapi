@@ -43,5 +43,6 @@ def main(global_config, **settings):
     )
     config.add_route("radioplaylist", "/rplaylist/{playlist_id:[a-zA-Z0-9\.\-\/]+}")
     config.add_route("episode", "/episode/{episode_url:[a-zA-Z0-9\.\-\/]+}")
+    config.add_route('last-broadcast-list', '/last-broadcast-list')
     config.scan()
     return config.make_wsgi_app()
