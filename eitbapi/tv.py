@@ -228,6 +228,12 @@ def last_broadcast_list(request):
     playlist_data = get_last_broadcast_data(number_of_items)
     web_media = playlist_data['web_media']
     data = []
+    result = {
+        "@context": "http://www.w3.org/ns/hydra/context.jsonld",
+        "@id": request.route_url("last-broadcast-list"),
+        "@type": "Last tv shows",
+        "parent": {},
+    }
     for item in web_media:
         language = item.get("IDIOMA", "")
         data.append({
@@ -239,7 +245,7 @@ def last_broadcast_list(request):
                 item.get('ID_WEB_MEDIA'),
                 request=request,
             ),
-            '@type': 'Last tv shows',
+            '@type': 'Episode',
             'title': item.get('NAME_{}'.format(language)),
             'title_eu': item.get('NAME_EU'),
             'title_es': item.get('NAME_ES'),
@@ -252,4 +258,5 @@ def last_broadcast_list(request):
             'episode_image_thumbnail': item.get('THUMBNAIL_URL', ''),
             'language': language.lower()
         })
-    return data 
+    result['member'] = data
+    return result 
