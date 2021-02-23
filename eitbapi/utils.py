@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 import os
 import json
 import datetime
-import pytz 
+import pytz
 
 
 if sys.version_info >= (3, 0, 0):
@@ -26,10 +26,13 @@ EITB_VIDEO_URL = "https://www.eitb.tv/es/video/{}/{}/{}/{}/"
 
 EITB_BASE_URL = "https://www.eitb.tv/"
 
-EITB_CACHED_PROGRAM_LIST_XML_URL = (
+EITB_CACHED_TV_PROGRAM_LIST_XML_URL = (
     "https://raw.githubusercontent.com/erral/eitbapi/master/cache.json"
 )
 EITB_TV_PROGRAM_LIST_XML_URL = "https://www.eitb.tv/eu/menu/getMenu/tv/"
+
+
+EITB_CACHED_RADIO_PROGRAM_LIST_XML_URL = "https://raw.githubusercontent.com/erral/eitbapi/master/radio-cache.json"
 EITB_RADIO_PROGRAM_LIST_XML_URL = "https://www.eitb.tv/es/menu/getMenu/radio/"
 
 EITB_LAST_BROADCAST_URL = 'https://mam.eitb.eus/mam/REST/ServiceMultiweb/SmartPlaylistByDestination/MULTIWEBTV/12/BROADCST_DATE/DESC/{}/'
@@ -90,7 +93,7 @@ def build_program_list_by_hash(menu_hash, mode="tv", first=False):
 
 
 def get_tv_program_data():
-    res = requests.get(EITB_CACHED_PROGRAM_LIST_XML_URL)
+    res = requests.get(EITB_CACHED_TV_PROGRAM_LIST_XML_URL)
     try:
         result = res.json()
     except:
@@ -137,7 +140,17 @@ def get_last_broadcast_data(number_of_items):
     listjson = json.loads(listdata.content)
     return listjson
 
+
 def get_radio_program_data():
+    res = requests.get(EITB_CACHED_RADIO_PROGRAM_LIST_XML_URL)
+    try:
+        result = res.json()
+    except:
+        result = []
+    return result
+
+
+def _get_radio_program_data():
     results = []
     menudata = requests.get(EITB_RADIO_PROGRAM_LIST_XML_URL)
     menudict = xml_to_dict(menudata.content)
@@ -330,4 +343,4 @@ def date_to_iso_format(date):
         dateiso = date_to_format.isoformat()
     except (TypeError, ValueError):
         dateiso = date
-    return dateiso 
+    return dateiso
