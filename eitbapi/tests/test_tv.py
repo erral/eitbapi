@@ -42,6 +42,7 @@ class TVTests(unittest.TestCase):
                     subresult.headers.get("Content-type").startswith("application/json")
                 )
 
+    @unittest.skip("Test skip")
     def test_one_episode(self):
         res = self.testapp.get("/playlist", status=200)
         members = json.loads(res.text).get("member", [])
