@@ -13,7 +13,7 @@ jobs:
       - name: pull-request-action
         uses: vsoch/pull-request-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.REPO_SCOPED_TOKEN }}
           PULL_REQUEST_BRANCH: "master"
           BRANCH_PREFIX: "create-pull-request"
           PULL_REQUEST_TITLE: "This is an automated PR to update the cache"
