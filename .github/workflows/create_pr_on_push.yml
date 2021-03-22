@@ -10,12 +10,15 @@ jobs:
     name: PullRequestAction
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: pull-request-action
         uses: peter-evans/create-pull-request@v3
         env:
           token: ${{ secrets.REPO_SCOPED_TOKEN }}
           base: "master"
-          branch: "create-pull-request"
+          branch: create-pull-request
           branch-suffix: "timestamp"
           title: "This is an automated PR to update the cache"
           body: "This PR was created automatically"
