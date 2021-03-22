@@ -17,8 +17,8 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         env:
           token: ${{ secrets.REPO_SCOPED_TOKEN }}
-          base: "master"
+          base: master
           branch: create-pull-request
-          branch-suffix: "timestamp"
+          branch-suffix: timestamp
           title: "This is an automated PR to update the cache"
           body: "This PR was created automatically"
