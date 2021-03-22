@@ -11,10 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: pull-request-action
-        uses: vsoch/pull-request-action@master
+        uses: peter-evans/pull-request-action@v3
         env:
-          GITHUB_TOKEN: ${{ secrets.REPO_SCOPED_TOKEN }}
-          PULL_REQUEST_BRANCH: "master"
-          BRANCH_PREFIX: "create-pull-request"
-          PULL_REQUEST_TITLE: "This is an automated PR to update the cache"
-          PULL_REQUEST_BODY: "This PR was created automatically"
+          token: ${{ secrets.REPO_SCOPED_TOKEN }}
+          base: "master"
+          branch: "create-pull-request"
+          branch-suffix: timestamp
+          title: "This is an automated PR to update the cache"
+          body: "This PR was created automatically"
