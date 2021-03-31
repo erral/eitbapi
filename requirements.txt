@@ -37,3 +37,4 @@ WebTest==2.0.23
 youtube-dl==2020.6.16.1
 zope.deprecation==4.2.0
 zope.interface==4.3.2
+setuptools==45.0.0
