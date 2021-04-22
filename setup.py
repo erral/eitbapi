@@ -44,7 +44,7 @@ setup(name='eitbapi',
       zip_safe=False,
       tests_require=tests_requires,
       extras_require={'testing': tests_requires},
-      install_requires=requires
+      install_requires=requires,
       test_suite="eitbapi",
       entry_points="""\
       [paste.app_factory]
