@@ -20,7 +20,7 @@ requires = [
     "youtube-dl",
     "requests",
     "pytz",
-    "webtest"
+    "webtest",
     "pyramid_chameleon",
 ]
 
