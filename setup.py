@@ -21,7 +21,7 @@ requires = [
     "requests",
     "pytz",
     "webtest"
-
+    "pyramid_chameleon",
 ]
 
 setup(name='eitbapi',
