@@ -14,6 +14,16 @@ tests_requires = [
     'pytest-cov',
 ]
 
+requires = [
+    "pyramid",
+    "Paste",
+    "youtube-dl",
+    "requests",
+    "pytz",
+    "webtest"
+
+]
+
 setup(name='eitbapi',
       version='1.0',
       description='eitbapi',
@@ -34,6 +44,7 @@ setup(name='eitbapi',
       zip_safe=False,
       tests_require=tests_requires,
       extras_require={'testing': tests_requires},
+      install_requires=requires
       test_suite="eitbapi",
       entry_points="""\
       [paste.app_factory]
